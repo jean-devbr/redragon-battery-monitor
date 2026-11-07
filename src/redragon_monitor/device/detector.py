@@ -22,6 +22,15 @@ VENDOR_USAGE_PAGE = 0xFF02
 VENDOR_REPORT_ID = 0x08
 VENDOR_REPORT_BYTES = 16
 
+LONG_ITEM = 0xFE
+ITEM_MAIN = 0
+ITEM_GLOBAL = 1
+TAG_INPUT = 0x8
+TAG_OUTPUT = 0x9
+TAG_PUSH = 0xA
+TAG_POP = 0xB
+GLOBAL_FIELDS = {0x0: "page", 0x7: "size", 0x8: "id", 0x9: "count"}
+
 
 @dataclass(frozen=True)
 class DeviceInterface:
@@ -35,9 +44,9 @@ def _items(desc: bytes):
     i = 0
     while i < len(desc):
         prefix = desc[i]
-        if prefix == 0xFE:
-            if i + 2 >= len(desc):
-                return
+        if prefix == LONG_ITEM and i + 2 >= len(desc):
+            return
+        if prefix == LONG_ITEM:
             i += 3 + desc[i + 1]
             continue
         size = (0, 1, 2, 4)[prefix & 0x03]
@@ -56,29 +65,23 @@ def has_vendor_report(
     stack: list[dict] = []
     found_in = found_out = False
     for typ, tag, val in _items(desc):
-        if typ == 1:
-            if tag == 0x0:
-                g["page"] = val
-            elif tag == 0x7:
-                g["size"] = val
-            elif tag == 0x8:
-                g["id"] = val
-            elif tag == 0x9:
-                g["count"] = val
-            elif tag == 0xA:
-                stack.append(dict(g))
-            elif tag == 0xB and stack:
-                g = stack.pop()
-        elif typ == 0 and tag in (0x8, 0x9):
-            if (
-                g["page"] == usage_page
-                and g["id"] == report_id
-                and g["size"] * g["count"] == length * 8
-            ):
-                if tag == 0x8:
-                    found_in = True
-                else:
-                    found_out = True
+        if typ == ITEM_GLOBAL and tag in GLOBAL_FIELDS:
+            g[GLOBAL_FIELDS[tag]] = val
+            continue
+        if typ == ITEM_GLOBAL and tag == TAG_PUSH:
+            stack.append(dict(g))
+            continue
+        if typ == ITEM_GLOBAL and tag == TAG_POP and stack:
+            g = stack.pop()
+            continue
+        if typ != ITEM_MAIN or tag not in (TAG_INPUT, TAG_OUTPUT):
+            continue
+        if g["page"] != usage_page or g["id"] != report_id:
+            continue
+        if g["size"] * g["count"] != length * 8:
+            continue
+        found_in = found_in or tag == TAG_INPUT
+        found_out = found_out or tag == TAG_OUTPUT
     return found_in and found_out
 
 

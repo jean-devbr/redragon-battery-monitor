@@ -99,10 +99,11 @@ def main(argv: list[str] | None = None) -> int:
                         format="%(levelname)s %(name)s: %(message)s")
     service = BatteryService()
 
+    if args.watch is not None and args.watch < 5:
+        print("--watch precisa ser de pelo menos 5 segundos.", file=sys.stderr)
+        return 1
+
     if args.watch is not None:
-        if args.watch < 5:
-            print("--watch precisa ser de pelo menos 5 segundos.", file=sys.stderr)
-            return 1
         policy = LowBatteryPolicy(args.threshold) if args.notify else None
         notifier = DesktopNotifier() if args.notify else None
         return run_watch(service, args.watch, args.json, policy, notifier)

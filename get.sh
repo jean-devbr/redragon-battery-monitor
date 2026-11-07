@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-STABLE_REF="v0.1.0"
+STABLE_REF="v0.1.1"
 
 TMP_DIR=""
 cleanup() { [[ -n "$TMP_DIR" ]] && rm -rf "$TMP_DIR"; }

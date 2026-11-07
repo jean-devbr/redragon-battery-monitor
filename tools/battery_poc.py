@@ -100,17 +100,18 @@ def main():
             continue
         except OSError:
             continue
-        if result:
-            result.update(status="ok", connection=PIDS[pid], device=path,
-                          timestamp=time.strftime("%Y-%m-%dT%H:%M:%S"))
-            if as_json:
-                print(json.dumps(result, ensure_ascii=False))
-            else:
-                state = "carregando" if result["charging"] else "na bateria"
-                print(f"Bateria: {result['percent']}% ({state})")
-                print(f"Tensão:  {result['voltage_mv']} mV")
-                print(f"Conexão: {result['connection']} ({path})")
+        if not result:
+            continue
+        result.update(status="ok", connection=PIDS[pid], device=path,
+                      timestamp=time.strftime("%Y-%m-%dT%H:%M:%S"))
+        if as_json:
+            print(json.dumps(result, ensure_ascii=False))
             return 0
+        state = "carregando" if result["charging"] else "na bateria"
+        print(f"Bateria: {result['percent']}% ({state})")
+        print(f"Tensão:  {result['voltage_mv']} mV")
+        print(f"Conexão: {result['connection']} ({path})")
+        return 0
 
     if denied and len(denied) == len(ifaces):
         msg = f"Sem permissão para {', '.join(denied)}. Rode com sudo."
