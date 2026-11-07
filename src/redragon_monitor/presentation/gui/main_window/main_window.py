@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
 )
 
 from redragon_monitor.battery.domain.battery_status import BatteryStatus
+from redragon_monitor.battery.domain.read_status import ReadStatus
 from redragon_monitor.presentation.gui.app_settings import AppSettings
 from redragon_monitor.presentation.gui.battery_icon_painter import BatteryIconPainter
 from redragon_monitor.presentation.gui.github_icon import GithubIcon
@@ -171,7 +172,10 @@ class MainWindow(QWidget):
 
     def _show_unavailable(self, status: BatteryStatus) -> None:
         self.percent_label.setText(EMPTY)
-        self.state_label.setText(self._text.message_with_detail(status))
+        unavailable = status.status is ReadStatus.UNAVAILABLE
+        self.state_label.setText(
+            self._text.t("window.unavailable") if unavailable else self._text.message_with_detail(status)
+        )
         self.bar.setEnabled(False)
         self.bar.setValue(0)
         self.voltage_value.setText(EMPTY)

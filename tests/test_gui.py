@@ -156,3 +156,20 @@ def test_github_icon_renders(app):
     image = GithubIcon().pixmap(QColor("#000000"), 32).toImage()
     opaque = sum(1 for x in range(32) for y in range(32) if image.pixelColor(x, y).alpha() > 0)
     assert 200 < opaque < 32 * 32
+
+
+def test_unavailable_tells_user_to_press_refresh(app, settings):
+    translator = make_translator()
+    text = StatusTextFormatter(StatusMessages(translator), translator)
+    w = MainWindow(settings, BatteryIconPainter(), text, False, hide_on_close=False)
+    w.show_status(BatteryStatus(ReadStatus.UNAVAILABLE, FIXED_TIME, interface=RECEIVER), None)
+    assert "Atualizar agora" in w.state_label.text() and "repouso" in w.state_label.text()
+    translator.set_language(Language.EN)
+    w.retranslate()
+    assert "Refresh now" in w.state_label.text()
+
+
+def test_other_failures_keep_their_message(app, settings):
+    w = window(settings)
+    w.show_status(BatteryStatus(ReadStatus.PERMISSION_DENIED, FIXED_TIME), None)
+    assert "permissão" in w.state_label.text()

@@ -56,6 +56,10 @@ PT = {
     "autostart.error": "Não foi possível alterar: {error}",
     "notify.title": "Bateria do mouse baixa",
     "notify.body": "Redragon M719RGB-PRO com {percent}%. Conecte o cabo USB-C.",
+    "window.unavailable": (
+        "Mouse desligado ou em repouso.\nMexa o mouse e aperte o botão “Atualizar agora” "
+        "para ler a bateria novamente."
+    ),
     "window.github": "GitHub",
     "window.github.tooltip": "Abrir o repositório no GitHub para sugerir melhorias ou relatar problemas",
     "update.section": "Atualizações",
@@ -133,6 +137,10 @@ EN = {
     "autostart.error": "Could not change it: {error}",
     "notify.title": "Mouse battery low",
     "notify.body": "Redragon M719RGB-PRO at {percent}%. Connect the USB-C cable.",
+    "window.unavailable": (
+        "Mouse turned off or asleep.\nMove the mouse and press the “Refresh now” button "
+        "to read the battery again."
+    ),
     "window.github": "GitHub",
     "window.github.tooltip": "Open the GitHub repository to suggest improvements or report issues",
     "update.section": "Updates",
