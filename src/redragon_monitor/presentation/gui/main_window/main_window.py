@@ -234,8 +234,6 @@ class MainWindow(QWidget):
         self.autostart_check.toggled.connect(self.autostart_changed)
 
     def _build_update_widgets(self, settings: AppSettings) -> None:
-        self.header_version_label = QLabel(f"v{self._installed_version}" if self._installed_version else "")
-        self.header_version_label.setStyleSheet("color: palette(placeholder-text); font-size: 10pt;")
         self.language_button = QPushButton()
         self.language_button.setFlat(True)
         self.language_button.clicked.connect(self._toggle_language)
@@ -271,7 +269,6 @@ class MainWindow(QWidget):
     def _build_layout(self) -> None:
         title_row = QHBoxLayout()
         title_row.addWidget(self.title_label)
-        title_row.addWidget(self.header_version_label)
         title_row.addStretch(1)
         title_row.addWidget(self.language_button)
         head = QHBoxLayout()

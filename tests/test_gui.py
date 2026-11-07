@@ -117,7 +117,6 @@ def test_update_section_states(app, settings):
 
     w = MainWindow(settings, BatteryIconPainter(), TEXT, False, hide_on_close=False, installed_version="0.4.0")
     assert w.version_label.text() == "Versão instalada: 0.4.0"
-    assert w.header_version_label.text() == "v0.4.0"
     assert w.windowTitle() == "Redragon Battery Monitor 0.4.0"
     w.show_update_checking()
     assert w.update_status_label.text() == "Verificando atualizações…"

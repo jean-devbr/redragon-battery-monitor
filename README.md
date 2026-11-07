@@ -4,7 +4,7 @@
 
 **Nível real da bateria do mouse Redragon M719RGB-PRO no Ubuntu**
 
-[![Versão](https://img.shields.io/badge/vers%C3%A3o-0.6.0-2e9d4f?style=for-the-badge)](https://github.com/jean-devbr/redragon-battery-monitor/tree/v0.6.0)
+[![Versão](https://img.shields.io/badge/vers%C3%A3o-0.6.1-2e9d4f?style=for-the-badge)](https://github.com/jean-devbr/redragon-battery-monitor/tree/v0.6.1)
 
 ![Ubuntu](https://img.shields.io/badge/Ubuntu-24.04-E95420?style=flat-square&logo=ubuntu&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)
