@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-STABLE_REF="v0.5.1"
+STABLE_REF="v0.5.2"
 
 detect_lang() {
   local value

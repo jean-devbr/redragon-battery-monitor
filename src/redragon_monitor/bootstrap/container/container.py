@@ -36,6 +36,7 @@ from redragon_monitor.update.domain.version import Version
 from redragon_monitor.update.infrastructure.github_stable_ref_source import GitHubStableRefSource
 from redragon_monitor.update.infrastructure.terminal_update_launcher import TerminalUpdateLauncher
 
+REPOSITORY_URL = "https://github.com/jean-devbr/redragon-battery-monitor"
 INSTALLER_URL = "https://raw.githubusercontent.com/jean-devbr/redragon-battery-monitor/main/get.sh"
 
 
@@ -99,6 +100,7 @@ class Container:
             self._detector,
             self.check_for_update(),
             self.update_launcher(),
+            REPOSITORY_URL,
         )
 
     def _build_read_battery(self) -> ReadBatteryUseCase:

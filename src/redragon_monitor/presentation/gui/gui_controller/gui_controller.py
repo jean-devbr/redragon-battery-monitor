@@ -3,7 +3,8 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
-from PySide6.QtCore import QObject, QThread, QTimer, Signal, Slot
+from PySide6.QtCore import QObject, QThread, QTimer, QUrl, Signal, Slot
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QApplication, QMessageBox
 
 from redragon_monitor.autostart.application.ports.autostart import Autostart
@@ -41,6 +42,7 @@ class GuiController(QObject):
         detector: LanguageDetector,
         update_worker: UpdateWorker,
         update_launcher: UpdateLauncher,
+        repository_url: str,
     ):
         super().__init__()
         self._app = app
@@ -53,6 +55,7 @@ class GuiController(QObject):
         self._detector = detector
         self._update_worker = update_worker
         self._update_launcher = update_launcher
+        self._repository_url = repository_url
         self._update: Optional[UpdateCheck] = None
         self._busy = False
         self._thread = QThread(self)
@@ -114,6 +117,10 @@ class GuiController(QObject):
             self._translator.t("update.manual.title"),
             self._translator.t("update.manual.body", command=self._update_launcher.manual_command()),
         )
+
+    @Slot()
+    def open_repository(self) -> None:
+        QDesktopServices.openUrl(QUrl(self._repository_url))
 
     @Slot(bool)
     def on_check_updates(self, value: bool) -> None:
@@ -212,6 +219,7 @@ class GuiController(QObject):
         self._window.check_update_requested.connect(self.check_update)
         self._window.install_update_requested.connect(self.install_update)
         self._window.check_updates_changed.connect(self.on_check_updates)
+        self._window.repository_requested.connect(self.open_repository)
 
     def _connect_tray(self) -> None:
         if self._tray is None:

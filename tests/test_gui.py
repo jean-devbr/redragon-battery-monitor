@@ -135,3 +135,24 @@ def test_check_updates_setting(settings):
     assert settings.check_updates
     settings.check_updates = False
     assert not settings.check_updates
+
+
+def test_github_button_requests_repository(app, settings):
+    w = window(settings)
+    requested = []
+    w.repository_requested.connect(lambda: requested.append(True))
+    assert w.github_button.text() == "GitHub"
+    assert "GitHub" in w.github_button.toolTip()
+    assert not w.github_button.icon().isNull()
+    w.github_button.click()
+    assert requested == [True]
+
+
+def test_github_icon_renders(app):
+    from PySide6.QtGui import QColor
+
+    from redragon_monitor.presentation.gui.github_icon import GithubIcon
+
+    image = GithubIcon().pixmap(QColor("#000000"), 32).toImage()
+    opaque = sum(1 for x in range(32) for y in range(32) if image.pixelColor(x, y).alpha() > 0)
+    assert 200 < opaque < 32 * 32

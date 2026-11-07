@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (
 from redragon_monitor.battery.domain.battery_status import BatteryStatus
 from redragon_monitor.presentation.gui.app_settings import AppSettings
 from redragon_monitor.presentation.gui.battery_icon_painter import BatteryIconPainter
+from redragon_monitor.presentation.gui.github_icon import GithubIcon
 from redragon_monitor.presentation.text.status_text_formatter import StatusTextFormatter
 from redragon_monitor.update.domain.update_check import UpdateCheck
 from redragon_monitor.update.domain.update_status import UpdateStatus
@@ -45,6 +46,7 @@ class MainWindow(QWidget):
     check_update_requested = Signal()
     install_update_requested = Signal()
     check_updates_changed = Signal(bool)
+    repository_requested = Signal()
 
     def __init__(
         self,
@@ -94,6 +96,8 @@ class MainWindow(QWidget):
         self.check_update_button.setText(t("update.check"))
         self.install_update_button.setText(t("update.install"))
         self.check_updates_check.setText(t("update.auto"))
+        self.github_button.setText(t("window.github"))
+        self.github_button.setToolTip(t("window.github.tooltip"))
         self._render()
         self._render_update()
 
@@ -239,6 +243,10 @@ class MainWindow(QWidget):
         self.install_update_button = QPushButton()
         self.install_update_button.setVisible(False)
         self.install_update_button.clicked.connect(self.install_update_requested)
+        self.github_button = QPushButton()
+        self.github_button.setFlat(True)
+        self.github_button.setIcon(GithubIcon().icon(self.palette().windowText().color()))
+        self.github_button.clicked.connect(self.repository_requested)
         self.check_updates_check = QCheckBox()
         self.check_updates_check.setChecked(settings.check_updates)
         self.check_updates_check.toggled.connect(self.check_updates_changed)
@@ -292,3 +300,8 @@ class MainWindow(QWidget):
         root.addWidget(self.settings_box)
         root.addWidget(self._build_update_box())
         root.addWidget(self.note_label)
+        footer = QHBoxLayout()
+        footer.addStretch(1)
+        footer.addWidget(self.github_button)
+        footer.addStretch(1)
+        root.addLayout(footer)

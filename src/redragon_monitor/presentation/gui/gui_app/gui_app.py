@@ -40,6 +40,7 @@ class GuiApp:
         detector: LanguageDetector,
         check_for_update: CheckForUpdateUseCase,
         update_launcher: UpdateLauncher,
+        repository_url: str,
     ):
         self._monitor_factory = monitor_factory
         self._autostart = autostart
@@ -49,6 +50,7 @@ class GuiApp:
         self._detector = detector
         self._check_for_update = check_for_update
         self._update_launcher = update_launcher
+        self._repository_url = repository_url
 
     def run(self, minimized: bool) -> int:
         app = self._create_application()
@@ -103,4 +105,5 @@ class GuiApp:
             self._detector,
             UpdateWorker(self._check_for_update),
             self._update_launcher,
+            self._repository_url,
         )
