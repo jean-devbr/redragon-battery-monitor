@@ -94,6 +94,14 @@ redragon-battery-uninstall
 - Ao conectar o cabo, o nível pode cair um pouco (ex.: 100 % → 95 %). É o comportamento do mouse.
 - A verificação de atualizações consulta o GitHub ao abrir o programa e pode ser desativada em **Atualizações**.
 
+## Autor
+
+Desenvolvido por **Jean Costa**. Acompanhe nas redes:
+
+[![Instagram](https://img.shields.io/badge/Instagram-@jeanooficial12-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/jeanooficial12/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Jean%20Costa-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/jean-costa-0040962b8/)
+[![YouTube](https://img.shields.io/badge/YouTube-Aprendendo%20com%20Jean-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@aprendendoComJean)
+
 ## Licença
 
 Distribuído sob a licença [MIT](LICENSE).

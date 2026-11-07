@@ -94,6 +94,14 @@ redragon-battery-uninstall
 - When the cable is connected, the level may drop slightly (e.g. 100 % → 95 %). This is how the mouse behaves.
 - The update check contacts GitHub on startup and can be turned off in **Updates**.
 
+## Author
+
+Developed by **Jean Costa**. Follow on social media:
+
+[![Instagram](https://img.shields.io/badge/Instagram-@jeanooficial12-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/jeanooficial12/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Jean%20Costa-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/jean-costa-0040962b8/)
+[![YouTube](https://img.shields.io/badge/YouTube-Aprendendo%20com%20Jean-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@aprendendoComJean)
+
 ## License
 
 Distributed under the [MIT](LICENSE) license.
