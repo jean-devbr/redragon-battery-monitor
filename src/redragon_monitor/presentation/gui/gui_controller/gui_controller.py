@@ -12,6 +12,8 @@ from redragon_monitor.presentation.gui.app_settings import AppSettings
 from redragon_monitor.presentation.gui.battery_worker import BatteryWorker
 from redragon_monitor.presentation.gui.main_window import MainWindow
 from redragon_monitor.presentation.gui.tray_icon import TrayIcon
+from redragon_monitor.presentation.i18n.language_detector import LanguageDetector
+from redragon_monitor.presentation.i18n.translator import Translator
 
 log = logging.getLogger(__name__)
 
@@ -31,6 +33,8 @@ class GuiController(QObject):
         window: MainWindow,
         tray: Optional[TrayIcon],
         autostart: Autostart,
+        translator: Translator,
+        detector: LanguageDetector,
     ):
         super().__init__()
         self._app = app
@@ -39,6 +43,8 @@ class GuiController(QObject):
         self._window = window
         self._tray = tray
         self._autostart = autostart
+        self._translator = translator
+        self._detector = detector
         self._busy = False
         self._thread = QThread(self)
         self._timer = QTimer(self)
@@ -101,8 +107,21 @@ class GuiController(QObject):
         try:
             self._apply_autostart(enabled)
         except OSError as error:
-            QMessageBox.warning(self._window, "Iniciar com o sistema", f"Não foi possível alterar: {error}")
+            QMessageBox.warning(
+                self._window,
+                self._translator.t("autostart.title"),
+                self._translator.t("autostart.error", error=error),
+            )
             self._window.set_autostart_checked(self._autostart.is_enabled())
+
+    @Slot(str)
+    def on_language(self, preference: str) -> None:
+        self._settings.language = preference
+        self._translator.set_language(self._detector.resolve(preference))
+        self._window.retranslate()
+        if self._tray is None:
+            return
+        self._tray.retranslate()
 
     @Slot()
     def show_window(self) -> None:
@@ -134,6 +153,7 @@ class GuiController(QObject):
         self._window.threshold_changed.connect(self.on_threshold)
         self._window.notify_changed.connect(self.on_notify)
         self._window.autostart_changed.connect(self.on_autostart)
+        self._window.language_changed.connect(self.on_language)
 
     def _connect_tray(self) -> None:
         if self._tray is None:

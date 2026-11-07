@@ -4,13 +4,15 @@
 
 **Nível real da bateria do mouse Redragon M719RGB-PRO no Ubuntu**
 
-[![Versão](https://img.shields.io/badge/vers%C3%A3o-0.3.0-2e9d4f?style=for-the-badge)](https://github.com/jean-devbr/redragon-battery-monitor/tree/v0.3.0)
+[![Versão](https://img.shields.io/badge/vers%C3%A3o-0.4.0-2e9d4f?style=for-the-badge)](https://github.com/jean-devbr/redragon-battery-monitor/tree/v0.4.0)
 
 ![Ubuntu](https://img.shields.io/badge/Ubuntu-24.04-E95420?style=flat-square&logo=ubuntu&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)
 ![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-blue?style=flat-square)
 
-<img src=".github/assets/screenshot.png" alt="Janela do Redragon Battery Monitor" width="380">
+**Português** · [English](README.en.md)
+
+<img src=".github/assets/screenshot-pt.png" alt="Janela do Redragon Battery Monitor" width="380">
 
 </div>
 
@@ -23,6 +25,7 @@
 - Aviso quando a bateria estiver baixa
 - Funciona pelo receptor 2.4 GHz e pelo cabo USB-C
 - Opção de iniciar junto com o sistema
+- Interface em português e inglês
 - Consulta também pelo terminal
 
 ## Requisitos
@@ -50,13 +53,18 @@ Abra **Redragon Battery Monitor** no menu de aplicativos.
 
 - O ícone na barra superior mostra a porcentagem. Borda amarela indica que está carregando.
 - Fechar a janela mantém o programa na barra. Para encerrar, clique no ícone e escolha **Sair**.
-- Na janela é possível ativar **Iniciar com o sistema** e ajustar o aviso de bateria baixa.
+- Na janela é possível ativar **Iniciar com o sistema**, ajustar o aviso de bateria baixa e escolher o **idioma**.
 
 Pelo terminal:
 
 ```bash
 redragon-battery
+redragon-battery --lang en
 ```
+
+## Idioma
+
+O programa usa o idioma do Ubuntu automaticamente: português quando o sistema está em português e inglês nos demais casos. Para trocar, use o campo **Idioma** na janela ou a opção `--lang pt|en` no terminal.
 
 ## Atualização
 

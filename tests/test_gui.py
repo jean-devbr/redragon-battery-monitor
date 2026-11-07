@@ -16,9 +16,11 @@ from redragon_monitor.presentation.gui.battery_icon_painter import BatteryIconPa
 from redragon_monitor.presentation.gui.main_window import MainWindow
 from redragon_monitor.presentation.text.status_messages import StatusMessages
 from redragon_monitor.presentation.text.status_text_formatter import StatusTextFormatter
-from fakes import FIXED_TIME, RECEIVER
+from fakes import FIXED_TIME, RECEIVER, make_translator
+from redragon_monitor.presentation.i18n.language import Language
 
-TEXT = StatusTextFormatter(StatusMessages())
+TRANSLATOR = make_translator()
+TEXT = StatusTextFormatter(StatusMessages(TRANSLATOR), TRANSLATOR)
 
 
 @pytest.fixture(scope="module")
@@ -73,3 +75,25 @@ def test_icon_painter_sizes(app):
     assert painter.pixmap(50, size=22).width() == 22
     assert not painter.icon(None).isNull()
     assert painter.level_color(10).name() == "#d0342c"
+
+
+def test_window_retranslates_to_english(app, settings):
+    translator = make_translator()
+    text = StatusTextFormatter(StatusMessages(translator), translator)
+    w = MainWindow(settings, BatteryIconPainter(), text, False, hide_on_close=False)
+    w.show_status(ok(80), None)
+    assert w.state_label.text() == "Na bateria"
+    translator.set_language(Language.EN)
+    w.retranslate()
+    assert w.state_label.text() == "On battery"
+    assert w.refresh_button.text() == "Refresh now"
+    assert w.connection_value.text() == "2.4 GHz receiver"
+    assert w.settings_box.title() == "Settings"
+
+
+def test_language_setting_defaults_to_auto(settings):
+    assert settings.language == "auto"
+    settings.language = "en"
+    assert settings.language == "en"
+    settings.language = "xx"
+    assert settings.language == "auto"

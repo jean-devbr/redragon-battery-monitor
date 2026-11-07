@@ -5,6 +5,7 @@ from PySide6.QtCore import QSettings
 ORGANIZATION = "redragon-battery-monitor"
 APPLICATION = "settings"
 TRUE_VALUES = ("true", "1")
+LANGUAGE_CHOICES = ("auto", "pt", "en")
 
 
 class AppSettings:
@@ -37,6 +38,15 @@ class AppSettings:
     @notify.setter
     def notify(self, value: bool) -> None:
         self._store.setValue("notify", "true" if value else "false")
+
+    @property
+    def language(self) -> str:
+        value = str(self._store.value("language", LANGUAGE_CHOICES[0]))
+        return value if value in LANGUAGE_CHOICES else LANGUAGE_CHOICES[0]
+
+    @language.setter
+    def language(self, value: str) -> None:
+        self._store.setValue("language", value if value in LANGUAGE_CHOICES else LANGUAGE_CHOICES[0])
 
     def _read_int(self, key: str, default: int, low: int, high: int) -> int:
         try:

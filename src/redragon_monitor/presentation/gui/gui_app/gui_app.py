@@ -16,6 +16,8 @@ from redragon_monitor.presentation.gui.gui_controller import GuiController
 from redragon_monitor.presentation.gui.main_window import MainWindow
 from redragon_monitor.presentation.gui.single_instance import SingleInstance
 from redragon_monitor.presentation.gui.tray_icon import TrayIcon
+from redragon_monitor.presentation.i18n.language_detector import LanguageDetector
+from redragon_monitor.presentation.i18n.translator import Translator
 from redragon_monitor.presentation.text.status_text_formatter import StatusTextFormatter
 
 log = logging.getLogger(__name__)
@@ -31,11 +33,15 @@ class GuiApp:
         autostart: Autostart,
         clock: Clock,
         text: StatusTextFormatter,
+        translator: Translator,
+        detector: LanguageDetector,
     ):
         self._monitor_factory = monitor_factory
         self._autostart = autostart
         self._clock = clock
         self._text = text
+        self._translator = translator
+        self._detector = detector
 
     def run(self, minimized: bool) -> int:
         app = self._create_application()
@@ -66,9 +72,12 @@ class GuiApp:
 
     def _build_controller(self, app: QApplication) -> GuiController:
         settings = AppSettings()
+        self._translator.set_language(self._detector.resolve(settings.language))
         painter = BatteryIconPainter()
         tray = TrayIcon(painter, self._text) if TrayIcon.available() else None
         window = MainWindow(settings, painter, self._text, self._autostart.is_enabled(), hide_on_close=tray is not None)
         window.setWindowIcon(painter.app_icon())
         worker = BatteryWorker(self._monitor_factory(settings.threshold), self._clock)
-        return GuiController(app, settings, worker, window, tray, self._autostart)
+        return GuiController(
+            app, settings, worker, window, tray, self._autostart, self._translator, self._detector
+        )

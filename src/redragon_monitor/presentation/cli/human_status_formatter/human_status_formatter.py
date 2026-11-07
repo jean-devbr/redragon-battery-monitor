@@ -13,15 +13,23 @@ class HumanStatusFormatter:
             return self._reading(status)
         lines = [self._text.message(status)]
         if status.detail:
-            lines.append(f"Detalhe: {status.detail}")
+            lines.append(self._text.t("cli.detail", detail=status.detail))
         if last_good is not None and last_good.ok:
-            lines.append(f"Última leitura válida: {last_good.reading.percent}% às {last_good.timestamp:%H:%M:%S}")
+            lines.append(
+                self._text.t("cli.last_good", percent=last_good.reading.percent, time=self._text.time(last_good))
+            )
         return "\n".join(lines)
 
     def _reading(self, status: BatteryStatus) -> str:
         reading = status.reading
-        return (
-            f"Bateria: {reading.percent}% ({self._text.charge_state(reading)})\n"
-            f"Tensão:  {reading.voltage_mv} mV\n"
-            f"Conexão: {status.interface.connection.value} ({status.interface.hidraw_path})"
+        return "\n".join(
+            [
+                self._text.t("cli.battery", percent=reading.percent, state=self._text.charge_state(reading)),
+                self._text.t("cli.voltage", voltage=reading.voltage_mv),
+                self._text.t(
+                    "cli.connection",
+                    connection=self._text.connection_label(status),
+                    device=status.interface.hidraw_path,
+                ),
+            ]
         )

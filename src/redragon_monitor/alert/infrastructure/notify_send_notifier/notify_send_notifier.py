@@ -1,16 +1,19 @@
 import logging
 import shutil
 import subprocess
-from typing import Optional
+from typing import Callable, Optional
 
 log = logging.getLogger(__name__)
 
 APP_NAME = "Redragon Battery Monitor"
 TIMEOUT_S = 5
 
+LowBatteryTexts = Callable[[int], tuple[str, str]]
+
 
 class NotifySendNotifier:
-    def __init__(self, command: Optional[str] = None):
+    def __init__(self, texts: LowBatteryTexts, command: Optional[str] = None):
+        self._texts = texts
         self._command = command or shutil.which("notify-send")
         if not self._command:
             log.warning("notify-send não encontrado (pacote libnotify-bin); notificações desativadas")
@@ -20,11 +23,8 @@ class NotifySendNotifier:
         return self._command is not None
 
     def low_battery(self, percent: int) -> bool:
-        return self._send(
-            "Bateria do mouse baixa",
-            f"Redragon M719RGB-PRO com {percent}%. Conecte o cabo USB-C.",
-            urgency="critical",
-        )
+        title, body = self._texts(percent)
+        return self._send(title, body, urgency="critical")
 
     def _send(self, title: str, body: str, urgency: str = "normal", icon: str = "battery-low") -> bool:
         if not self._command:

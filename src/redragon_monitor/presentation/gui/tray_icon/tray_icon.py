@@ -23,11 +23,13 @@ class TrayIcon(QObject):
         self._painter = painter
         self._text = text
         self._threshold = DEFAULT_THRESHOLD
+        self._status: Optional[BatteryStatus] = None
+        self._last_good: Optional[BatteryStatus] = None
         self.icon = QSystemTrayIcon(painter.icon(None), self)
-        self.icon.setToolTip("Mouse Redragon: consultando…")
         self.menu = self._build_menu()
         self.icon.setContextMenu(self.menu)
         self.icon.activated.connect(self._on_activated)
+        self.retranslate()
 
     @staticmethod
     def available() -> bool:
@@ -39,10 +41,25 @@ class TrayIcon(QObject):
     def set_threshold(self, value: int) -> None:
         self._threshold = value
 
+    def retranslate(self) -> None:
+        self.open_action.setText(self._text.t("tray.menu.open"))
+        self.refresh_action.setText(self._text.t("tray.menu.refresh"))
+        self.quit_action.setText(self._text.t("tray.menu.quit"))
+        self._render_text()
+
     def update_status(self, status: BatteryStatus, last_good: Optional[BatteryStatus]) -> None:
-        self.icon.setToolTip(self._text.tooltip(status, last_good))
-        self.status_action.setText(self._text.tray_menu_line(status, last_good))
+        self._status = status
+        self._last_good = last_good
+        self._render_text()
         self.icon.setIcon(self._icon_for(status))
+
+    def _render_text(self) -> None:
+        if self._status is None:
+            self.icon.setToolTip(self._text.tray_querying())
+            self.status_action.setText(self._text.t("window.querying"))
+            return
+        self.icon.setToolTip(self._text.tooltip(self._status, self._last_good))
+        self.status_action.setText(self._text.tray_menu_line(self._status, self._last_good))
 
     def _icon_for(self, status: BatteryStatus):
         if not status.ok:
@@ -51,14 +68,20 @@ class TrayIcon(QObject):
 
     def _build_menu(self) -> QMenu:
         menu = QMenu()
-        self.status_action = QAction("Consultando…", menu)
+        self.status_action = QAction(menu)
         self.status_action.setEnabled(False)
+        self.open_action = QAction(menu)
+        self.open_action.triggered.connect(self.show_requested)
+        self.refresh_action = QAction(menu)
+        self.refresh_action.triggered.connect(self.refresh_requested)
+        self.quit_action = QAction(menu)
+        self.quit_action.triggered.connect(self.quit_requested)
         menu.addAction(self.status_action)
         menu.addSeparator()
-        menu.addAction("Abrir", self.show_requested.emit)
-        menu.addAction("Atualizar agora", self.refresh_requested.emit)
+        menu.addAction(self.open_action)
+        menu.addAction(self.refresh_action)
         menu.addSeparator()
-        menu.addAction("Sair", self.quit_requested.emit)
+        menu.addAction(self.quit_action)
         return menu
 
     def _on_activated(self, reason: QSystemTrayIcon.ActivationReason) -> None:

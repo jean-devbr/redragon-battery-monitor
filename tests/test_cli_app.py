@@ -14,13 +14,14 @@ from redragon_monitor.presentation.cli.watch_line_formatter import WatchLineForm
 from redragon_monitor.presentation.cli.watch_loop import WatchLoop
 from redragon_monitor.presentation.text.status_messages import StatusMessages
 from redragon_monitor.presentation.text.status_text_formatter import StatusTextFormatter
-from fakes import FIXED_TIME, RECEIVER, RecordingNotifier
+from fakes import FIXED_TIME, RECEIVER, RecordingNotifier, make_translator
 
 READING = BatteryReading(100, False, 0, 4137, bytes(17))
 OK = BatteryStatus(ReadStatus.OK, FIXED_TIME, reading=READING, interface=RECEIVER)
 UNAVAILABLE = BatteryStatus(ReadStatus.UNAVAILABLE, FIXED_TIME, interface=RECEIVER)
-MESSAGES = StatusMessages()
-TEXT = StatusTextFormatter(MESSAGES)
+TRANSLATOR = make_translator()
+MESSAGES = StatusMessages(TRANSLATOR)
+TEXT = StatusTextFormatter(MESSAGES, TRANSLATOR)
 
 
 class StaticReader:
@@ -32,16 +33,20 @@ class StaticReader:
         return self.status
 
 
-def app(status, lines):
+def app(status, lines, translator=None):
     reader = StaticReader(status)
+    translator = translator or make_translator()
+    messages = StatusMessages(translator)
+    text = StatusTextFormatter(messages, translator)
     return CliApp(
-        parser=CliArgumentParser(),
+        parser=CliArgumentParser(translator),
         read_battery=reader,
         monitor_factory=lambda threshold: BatteryMonitor(reader, LowBatteryPolicy(threshold), RecordingNotifier()),
-        json_formatter=JsonStatusFormatter(MESSAGES),
-        human_formatter=HumanStatusFormatter(TEXT),
-        line_formatter=WatchLineFormatter(TEXT),
+        json_formatter=JsonStatusFormatter(messages),
+        human_formatter=HumanStatusFormatter(text),
+        line_formatter=WatchLineFormatter(text),
         exit_codes=ExitCodes(),
+        translator=translator,
         output=lines.append,
     )
 
@@ -76,3 +81,26 @@ def test_watch_loop_renders_each_cycle():
     loop = WatchLoop(monitor, WatchLineFormatter(TEXT).format, lines.append, sleep=lambda _s: None)
     assert loop.run(10, notify=False, max_cycles=2) == 0
     assert len(lines) == 2 and "100%" in lines[0]
+
+
+def test_lang_option_switches_to_english():
+    lines = []
+    assert app(OK, lines).run(["--lang", "en"]) == 0
+    assert lines[0].splitlines() == [
+        "Battery: 100% (on battery)",
+        "Voltage: 4137 mV",
+        "Connection: 2.4 GHz receiver (/dev/hidraw1)",
+    ]
+
+
+def test_lang_option_switches_to_portuguese():
+    lines = []
+    assert app(OK, lines).run(["--lang", "pt"]) == 0
+    assert lines[0].splitlines()[2] == "Conexão: Receptor 2.4 GHz (/dev/hidraw1)"
+
+
+def test_json_keys_do_not_change_with_language():
+    lines = []
+    app(UNAVAILABLE, lines).run(["--json", "--lang", "en"])
+    data = json.loads(lines[0])
+    assert data["status"] == "unavailable" and data["message"].startswith("Mouse unavailable")

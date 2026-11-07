@@ -10,6 +10,8 @@ from redragon_monitor.presentation.cli.human_status_formatter import HumanStatus
 from redragon_monitor.presentation.cli.json_status_formatter import JsonStatusFormatter
 from redragon_monitor.presentation.cli.watch_line_formatter import WatchLineFormatter
 from redragon_monitor.presentation.cli.watch_loop import WatchLoop
+from redragon_monitor.presentation.i18n.language import Language
+from redragon_monitor.presentation.i18n.translator import Translator
 
 MIN_WATCH_INTERVAL = 5
 LOG_FORMAT = "%(levelname)s %(name)s: %(message)s"
@@ -25,6 +27,7 @@ class CliApp:
         human_formatter: HumanStatusFormatter,
         line_formatter: WatchLineFormatter,
         exit_codes: ExitCodes,
+        translator: Translator,
         output: Callable[[str], None] = print,
     ):
         self._parser = parser
@@ -34,13 +37,16 @@ class CliApp:
         self._human = human_formatter
         self._line = line_formatter
         self._exit_codes = exit_codes
+        self._translator = translator
         self._output = output
 
     def run(self, argv: Optional[list[str]] = None) -> int:
         args = self._parser.parse(argv)
         logging.basicConfig(level=logging.DEBUG if args.verbose else logging.WARNING, format=LOG_FORMAT)
+        if args.lang:
+            self._translator.set_language(Language(args.lang))
         if args.watch is not None and args.watch < MIN_WATCH_INTERVAL:
-            print(f"--watch precisa ser de pelo menos {MIN_WATCH_INTERVAL} segundos.", file=sys.stderr)
+            print(self._translator.t("cli.watch_min", seconds=MIN_WATCH_INTERVAL), file=sys.stderr)
             return self._exit_codes.FAILURE
         if args.watch is not None:
             return self._watch(args)

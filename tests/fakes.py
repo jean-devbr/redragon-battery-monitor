@@ -2,6 +2,9 @@ from datetime import datetime
 
 from redragon_monitor.device.domain.connection_type import ConnectionType
 from redragon_monitor.device.domain.device_interface import DeviceInterface
+from redragon_monitor.presentation.i18n.catalog import Catalog
+from redragon_monitor.presentation.i18n.language import Language
+from redragon_monitor.presentation.i18n.translator import Translator
 
 FIXED_TIME = datetime(2026, 11, 6, 23, 0, 0)
 WIRED = DeviceInterface(0xF55E, ConnectionType.USB_C, "/dev/hidraw3", "")
@@ -59,3 +62,7 @@ class RecordingNotifier:
     def low_battery(self, percent):
         self.alerts.append(percent)
         return True
+
+
+def make_translator(language: Language = Language.PT) -> Translator:
+    return Translator(Catalog(), language)
