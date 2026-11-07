@@ -11,8 +11,10 @@ def test_get_sh_installs_current_version():
     assert m and m.group(1) == f"v{__version__}"
 
 
-def test_readme_shows_current_version():
-    assert f"**Versão atual: {__version__}**" in (ROOT / "README.md").read_text()
+def test_readme_badge_shows_current_version():
+    readme = (ROOT / "README.md").read_text()
+    assert f"vers%C3%A3o-{__version__}-" in readme
+    assert f"/tree/v{__version__})" in readme
 
 
 def test_version_is_semver():
