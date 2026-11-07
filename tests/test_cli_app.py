@@ -1,10 +1,10 @@
 import json
 
-from redragon_monitor.application.battery_monitor import BatteryMonitor
-from redragon_monitor.application.low_battery_policy import LowBatteryPolicy
-from redragon_monitor.domain.battery_reading import BatteryReading
-from redragon_monitor.domain.battery_status import BatteryStatus
-from redragon_monitor.domain.read_status import ReadStatus
+from redragon_monitor.alert.application.battery_monitor import BatteryMonitor
+from redragon_monitor.alert.domain.low_battery_policy import LowBatteryPolicy
+from redragon_monitor.battery.domain.battery_reading import BatteryReading
+from redragon_monitor.battery.domain.battery_status import BatteryStatus
+from redragon_monitor.battery.domain.read_status import ReadStatus
 from redragon_monitor.presentation.cli.cli_app import CliApp
 from redragon_monitor.presentation.cli.cli_argument_parser import CliArgumentParser
 from redragon_monitor.presentation.cli.exit_codes import ExitCodes

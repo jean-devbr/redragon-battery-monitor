@@ -17,7 +17,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from redragon_monitor.domain.battery_status import BatteryStatus
+from redragon_monitor.battery.domain.battery_status import BatteryStatus
 from redragon_monitor.presentation.gui.app_settings import AppSettings
 from redragon_monitor.presentation.gui.battery_icon_painter import BatteryIconPainter
 from redragon_monitor.presentation.text.status_text_formatter import StatusTextFormatter

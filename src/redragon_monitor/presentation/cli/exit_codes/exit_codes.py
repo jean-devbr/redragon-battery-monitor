@@ -1,4 +1,4 @@
-from redragon_monitor.domain.read_status import ReadStatus
+from redragon_monitor.battery.domain.read_status import ReadStatus
 
 SUCCESS = 0
 FAILURE = 1

@@ -1,8 +1,8 @@
-from redragon_monitor.domain.connection_type import ConnectionType
-from redragon_monitor.infrastructure.devices.redragon_m719 import RedragonM719
-from redragon_monitor.infrastructure.hid.hid_item_reader import HidItemReader
-from redragon_monitor.infrastructure.hid.vendor_report_matcher import VendorReportMatcher
-from redragon_monitor.infrastructure.sysfs.sysfs_device_detector import SysfsDeviceDetector
+from redragon_monitor.device.domain.connection_type import ConnectionType
+from redragon_monitor.device.infrastructure.models.redragon_m719 import RedragonM719
+from redragon_monitor.device.infrastructure.hid.hid_item_reader import HidItemReader
+from redragon_monitor.device.infrastructure.hid.vendor_report_matcher import VendorReportMatcher
+from redragon_monitor.device.infrastructure.sysfs.sysfs_device_detector import SysfsDeviceDetector
 from conftest import RECEIVER_IF0_DESC, RECEIVER_IF1_DESC, WIRED_IF1_DESC
 
 SPEC = RedragonM719.spec()

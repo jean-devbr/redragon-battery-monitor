@@ -1,8 +1,8 @@
 from typing import Optional
 
-from redragon_monitor.domain.battery_reading import BatteryReading
-from redragon_monitor.domain.battery_status import BatteryStatus
-from redragon_monitor.domain.connection_type import ConnectionType
+from redragon_monitor.battery.domain.battery_reading import BatteryReading
+from redragon_monitor.battery.domain.battery_status import BatteryStatus
+from redragon_monitor.device.domain.connection_type import ConnectionType
 from redragon_monitor.presentation.text.status_messages import StatusMessages
 
 EMPTY = "—"

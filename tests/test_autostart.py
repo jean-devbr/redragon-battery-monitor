@@ -1,7 +1,7 @@
 import sys
 
-from redragon_monitor.infrastructure.autostart.gui_launch_command import GuiLaunchCommand
-from redragon_monitor.infrastructure.autostart.xdg_autostart import XdgAutostart
+from redragon_monitor.autostart.infrastructure.gui_launch_command import GuiLaunchCommand
+from redragon_monitor.autostart.infrastructure.xdg_autostart import XdgAutostart
 
 
 def test_enable_disable_roundtrip(tmp_path):

@@ -1,8 +1,8 @@
 import time
 from typing import Callable
 
-from redragon_monitor.application.battery_monitor import BatteryMonitor
-from redragon_monitor.domain.battery_status import BatteryStatus
+from redragon_monitor.alert.application.battery_monitor import BatteryMonitor
+from redragon_monitor.battery.domain.battery_status import BatteryStatus
 
 Render = Callable[[BatteryStatus, object], str]
 

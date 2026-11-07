@@ -2,10 +2,10 @@ import logging
 
 from PySide6.QtCore import QObject, Signal, Slot
 
-from redragon_monitor.application.battery_monitor import BatteryMonitor
-from redragon_monitor.application.ports.clock import Clock
-from redragon_monitor.domain.battery_status import BatteryStatus
-from redragon_monitor.domain.read_status import ReadStatus
+from redragon_monitor.alert.application.battery_monitor import BatteryMonitor
+from redragon_monitor.shared.application.ports.clock import Clock
+from redragon_monitor.battery.domain.battery_status import BatteryStatus
+from redragon_monitor.battery.domain.read_status import ReadStatus
 
 log = logging.getLogger(__name__)
 

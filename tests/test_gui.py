@@ -8,9 +8,9 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import QSettings
 from PySide6.QtWidgets import QApplication
 
-from redragon_monitor.domain.battery_reading import BatteryReading
-from redragon_monitor.domain.battery_status import BatteryStatus
-from redragon_monitor.domain.read_status import ReadStatus
+from redragon_monitor.battery.domain.battery_reading import BatteryReading
+from redragon_monitor.battery.domain.battery_status import BatteryStatus
+from redragon_monitor.battery.domain.read_status import ReadStatus
 from redragon_monitor.presentation.gui.app_settings import AppSettings
 from redragon_monitor.presentation.gui.battery_icon_painter import BatteryIconPainter
 from redragon_monitor.presentation.gui.main_window import MainWindow

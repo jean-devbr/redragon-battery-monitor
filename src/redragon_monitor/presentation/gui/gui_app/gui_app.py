@@ -6,9 +6,9 @@ from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QApplication
 
 from redragon_monitor import __version__
-from redragon_monitor.application.battery_monitor import BatteryMonitor
-from redragon_monitor.application.ports.autostart import Autostart
-from redragon_monitor.application.ports.clock import Clock
+from redragon_monitor.alert.application.battery_monitor import BatteryMonitor
+from redragon_monitor.autostart.application.ports.autostart import Autostart
+from redragon_monitor.shared.application.ports.clock import Clock
 from redragon_monitor.presentation.gui.app_settings import AppSettings
 from redragon_monitor.presentation.gui.battery_icon_painter import BatteryIconPainter
 from redragon_monitor.presentation.gui.battery_worker import BatteryWorker

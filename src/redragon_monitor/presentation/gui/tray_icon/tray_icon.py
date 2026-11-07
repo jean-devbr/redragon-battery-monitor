@@ -6,7 +6,7 @@ from PySide6.QtCore import QObject, Signal
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QMenu, QSystemTrayIcon
 
-from redragon_monitor.domain.battery_status import BatteryStatus
+from redragon_monitor.battery.domain.battery_status import BatteryStatus
 from redragon_monitor.presentation.gui.battery_icon_painter import BatteryIconPainter
 from redragon_monitor.presentation.text.status_text_formatter import StatusTextFormatter
 

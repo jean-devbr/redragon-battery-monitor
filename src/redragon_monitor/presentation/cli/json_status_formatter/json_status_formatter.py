@@ -1,6 +1,6 @@
 import json
 
-from redragon_monitor.domain.battery_status import BatteryStatus
+from redragon_monitor.battery.domain.battery_status import BatteryStatus
 from redragon_monitor.presentation.text.status_messages import StatusMessages
 
 

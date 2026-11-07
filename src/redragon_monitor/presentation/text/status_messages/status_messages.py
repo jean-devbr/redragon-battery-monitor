@@ -1,5 +1,5 @@
-from redragon_monitor.domain.battery_status import BatteryStatus
-from redragon_monitor.domain.read_status import ReadStatus
+from redragon_monitor.battery.domain.battery_status import BatteryStatus
+from redragon_monitor.battery.domain.read_status import ReadStatus
 
 MESSAGES = {
     ReadStatus.OK: "Leitura obtida.",

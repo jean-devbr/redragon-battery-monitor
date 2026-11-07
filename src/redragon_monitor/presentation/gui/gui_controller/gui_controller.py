@@ -6,8 +6,8 @@ from typing import Optional
 from PySide6.QtCore import QObject, QThread, QTimer, Signal, Slot
 from PySide6.QtWidgets import QApplication, QMessageBox
 
-from redragon_monitor.application.ports.autostart import Autostart
-from redragon_monitor.domain.battery_status import BatteryStatus
+from redragon_monitor.autostart.application.ports.autostart import Autostart
+from redragon_monitor.battery.domain.battery_status import BatteryStatus
 from redragon_monitor.presentation.gui.app_settings import AppSettings
 from redragon_monitor.presentation.gui.battery_worker import BatteryWorker
 from redragon_monitor.presentation.gui.main_window import MainWindow

@@ -2,8 +2,8 @@ import logging
 import sys
 from typing import Callable, Optional
 
-from redragon_monitor.application.battery_monitor import BatteryMonitor
-from redragon_monitor.application.read_battery import ReadBatteryUseCase
+from redragon_monitor.alert.application.battery_monitor import BatteryMonitor
+from redragon_monitor.battery.application.read_battery import ReadBatteryUseCase
 from redragon_monitor.presentation.cli.cli_argument_parser import CliArgumentParser
 from redragon_monitor.presentation.cli.exit_codes import ExitCodes
 from redragon_monitor.presentation.cli.human_status_formatter import HumanStatusFormatter

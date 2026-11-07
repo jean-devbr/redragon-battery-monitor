@@ -2,7 +2,7 @@ import argparse
 from typing import Optional
 
 from redragon_monitor import __version__
-from redragon_monitor.application.low_battery_policy.low_battery_policy import DEFAULT_THRESHOLD
+from redragon_monitor.alert.domain.low_battery_policy.low_battery_policy import DEFAULT_THRESHOLD
 
 
 class CliArgumentParser:

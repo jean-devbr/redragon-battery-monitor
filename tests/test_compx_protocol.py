@@ -1,10 +1,10 @@
 import pytest
 
-from redragon_monitor.domain.protocol_error import ProtocolError
-from redragon_monitor.infrastructure.compx.compx_battery_protocol import CompxBatteryProtocol
-from redragon_monitor.infrastructure.compx.compx_checksum import CompxChecksum
-from redragon_monitor.infrastructure.compx.compx_power_query import CompxPowerQuery
-from redragon_monitor.infrastructure.compx.compx_power_response_parser import CompxPowerResponseParser
+from redragon_monitor.battery.domain.protocol_error import ProtocolError
+from redragon_monitor.battery.infrastructure.compx.compx_battery_protocol import CompxBatteryProtocol
+from redragon_monitor.battery.infrastructure.compx.compx_checksum import CompxChecksum
+from redragon_monitor.battery.infrastructure.compx.compx_power_query import CompxPowerQuery
+from redragon_monitor.battery.infrastructure.compx.compx_power_response_parser import CompxPowerResponseParser
 from conftest import RESP_CHARGING, RESP_WIRELESS
 
 CHECKSUM = CompxChecksum()
