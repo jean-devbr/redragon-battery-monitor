@@ -40,6 +40,14 @@ class AppSettings:
         self._store.setValue("notify", "true" if value else "false")
 
     @property
+    def check_updates(self) -> bool:
+        return str(self._store.value("check_updates", "true")).lower() in TRUE_VALUES
+
+    @check_updates.setter
+    def check_updates(self, value: bool) -> None:
+        self._store.setValue("check_updates", "true" if value else "false")
+
+    @property
     def language(self) -> str:
         value = str(self._store.value("language", LANGUAGE_CHOICES[0]))
         return value if value in LANGUAGE_CHOICES else LANGUAGE_CHOICES[0]

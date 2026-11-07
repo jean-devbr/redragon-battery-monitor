@@ -97,3 +97,41 @@ def test_language_setting_defaults_to_auto(settings):
     assert settings.language == "en"
     settings.language = "xx"
     assert settings.language == "auto"
+
+
+def test_language_button_toggles_language(app, settings):
+    translator = make_translator()
+    text = StatusTextFormatter(StatusMessages(translator), translator)
+    w = MainWindow(settings, BatteryIconPainter(), text, False, hide_on_close=False)
+    chosen = []
+    w.language_changed.connect(chosen.append)
+    assert w.language_button.text() == "🌐 English"
+    w.language_button.click()
+    assert chosen == ["en"]
+
+
+def test_update_section_states(app, settings):
+    from redragon_monitor.update.domain.update_check import UpdateCheck
+    from redragon_monitor.update.domain.update_status import UpdateStatus
+    from redragon_monitor.update.domain.version import Version
+
+    w = MainWindow(settings, BatteryIconPainter(), TEXT, False, hide_on_close=False, installed_version="0.4.0")
+    assert w.version_label.text() == "Versão instalada: 0.4.0"
+    assert w.header_version_label.text() == "v0.4.0"
+    assert w.windowTitle() == "Redragon Battery Monitor 0.4.0"
+    w.show_update_checking()
+    assert w.update_status_label.text() == "Verificando atualizações…"
+    assert not w.check_update_button.isEnabled()
+    w.show_update(UpdateCheck(UpdateStatus.AVAILABLE, Version(0, 4, 0), Version(0, 5, 0)))
+    assert w.update_status_label.text() == "Nova versão disponível: 0.5.0"
+    assert not w.install_update_button.isHidden()
+    w.show_update(UpdateCheck(UpdateStatus.UP_TO_DATE, Version(0, 4, 0), Version(0, 4, 0)))
+    assert w.install_update_button.isHidden()
+    w.show_update(UpdateCheck(UpdateStatus.FAILED, Version(0, 4, 0)))
+    assert "Não foi possível" in w.update_status_label.text()
+
+
+def test_check_updates_setting(settings):
+    assert settings.check_updates
+    settings.check_updates = False
+    assert not settings.check_updates

@@ -4,7 +4,7 @@
 
 **Real battery level of the Redragon M719RGB-PRO mouse on Ubuntu**
 
-[![Version](https://img.shields.io/badge/version-0.4.0-2e9d4f?style=for-the-badge)](https://github.com/jean-devbr/redragon-battery-monitor/tree/v0.4.0)
+[![Version](https://img.shields.io/badge/version-0.5.0-2e9d4f?style=for-the-badge)](https://github.com/jean-devbr/redragon-battery-monitor/tree/v0.5.0)
 
 ![Ubuntu](https://img.shields.io/badge/Ubuntu-24.04-E95420?style=flat-square&logo=ubuntu&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)
@@ -26,6 +26,7 @@
 - Works through the 2.4 GHz receiver and the USB-C cable
 - Option to start with the system
 - Interface in English and Portuguese
+- New version notice and in-app update
 - Terminal command as well
 
 ## Requirements
@@ -53,7 +54,7 @@ Open **Redragon Battery Monitor** from the applications menu.
 
 - The top bar icon shows the percentage. A yellow border means it is charging.
 - Closing the window keeps the program in the top bar. To quit, click the icon and choose **Quit**.
-- In the window you can enable **Start with the system**, adjust the low battery alert and choose the **language**.
+- In the window you can enable **Start with the system**, adjust the low battery alert and switch the **language** with the button at the top.
 
 From the terminal:
 
@@ -64,11 +65,13 @@ redragon-battery --lang pt
 
 ## Language
 
-The program follows the Ubuntu language automatically: Portuguese when the system is in Portuguese and English otherwise. To change it, use the **Language** field in the window or the `--lang pt|en` option in the terminal.
+The program follows the Ubuntu language automatically: Portuguese when the system is in Portuguese and English otherwise. To change it, use the **🌐 English / 🌐 Português** button at the top of the window, the **Language** field in the settings or the `--lang pt|en` option in the terminal.
 
 ## Updating
 
-Run the installation command again.
+On startup the program checks whether a new version exists. When there is one, click **Update** in the **Updates** section of the window (or **Update to…** in the top bar icon). The installation runs in a terminal and the program opens again when it finishes.
+
+You can also update by running the installation command again.
 
 ## Uninstalling
 
@@ -89,6 +92,7 @@ redragon-battery-uninstall
 
 - The level shown is the one reported by the mouse and may change in 5 % steps.
 - When the cable is connected, the level may drop slightly (e.g. 100 % → 95 %). This is how the mouse behaves.
+- The update check contacts GitHub on startup and can be turned off in **Updates**.
 
 ## License
 

@@ -12,6 +12,7 @@ ALLOWED_FEATURES = {
     "battery": {"battery", "device", "shared"},
     "alert": {"alert", "battery", "device", "shared"},
     "autostart": {"autostart", "shared"},
+    "update": {"update", "shared"},
 }
 ALLOWED_LAYERS = {
     "domain": {"domain"},

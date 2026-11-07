@@ -13,7 +13,10 @@ from redragon_monitor.presentation.gui.battery_worker import BatteryWorker
 from redragon_monitor.presentation.gui.main_window import MainWindow
 from redragon_monitor.presentation.gui.tray_icon import TrayIcon
 from redragon_monitor.presentation.i18n.language_detector import LanguageDetector
+from redragon_monitor.presentation.gui.update_worker import UpdateWorker
 from redragon_monitor.presentation.i18n.translator import Translator
+from redragon_monitor.update.application.ports.update_launcher import UpdateLauncher
+from redragon_monitor.update.domain.update_check import UpdateCheck
 
 log = logging.getLogger(__name__)
 
@@ -24,6 +27,7 @@ MS_PER_SECOND = 1000
 class GuiController(QObject):
     poll_requested = Signal(bool)
     threshold_requested = Signal(int)
+    update_check_requested = Signal()
 
     def __init__(
         self,
@@ -35,6 +39,8 @@ class GuiController(QObject):
         autostart: Autostart,
         translator: Translator,
         detector: LanguageDetector,
+        update_worker: UpdateWorker,
+        update_launcher: UpdateLauncher,
     ):
         super().__init__()
         self._app = app
@@ -45,8 +51,12 @@ class GuiController(QObject):
         self._autostart = autostart
         self._translator = translator
         self._detector = detector
+        self._update_worker = update_worker
+        self._update_launcher = update_launcher
+        self._update: Optional[UpdateCheck] = None
         self._busy = False
         self._thread = QThread(self)
+        self._update_thread = QThread(self)
         self._timer = QTimer(self)
 
     @property
@@ -62,11 +72,52 @@ class GuiController(QObject):
         if not (minimized and self.has_tray):
             self.show_window()
         self.refresh()
+        if self._settings.check_updates:
+            self.check_update()
 
     def stop(self) -> None:
         self._timer.stop()
         self._thread.quit()
+        self._update_thread.quit()
         self._thread.wait(THREAD_WAIT_MS)
+        self._update_thread.wait(THREAD_WAIT_MS)
+
+    @Slot()
+    def check_update(self) -> None:
+        self._window.show_update_checking()
+        self.update_check_requested.emit()
+
+    @Slot(object)
+    def on_update_check(self, check: UpdateCheck) -> None:
+        self._update = check
+        self._window.show_update(check)
+        if self._tray is None:
+            return
+        self._tray.show_update(check)
+
+    @Slot()
+    def install_update(self) -> None:
+        if self._update is None or not self._update.available:
+            return
+        answer = QMessageBox.question(
+            self._window,
+            self._translator.t("update.confirm.title"),
+            self._translator.t("update.confirm.body", version=str(self._update.latest)),
+        )
+        if answer != QMessageBox.Yes:
+            return
+        if self._update_launcher.launch(self._translator.language.value):
+            self.quit()
+            return
+        QMessageBox.information(
+            self._window,
+            self._translator.t("update.manual.title"),
+            self._translator.t("update.manual.body", command=self._update_launcher.manual_command()),
+        )
+
+    @Slot(bool)
+    def on_check_updates(self, value: bool) -> None:
+        self._settings.check_updates = value
 
     @Slot()
     def refresh(self) -> None:
@@ -146,6 +197,10 @@ class GuiController(QObject):
         self.threshold_requested.connect(self._worker.change_threshold)
         self._worker.finished.connect(self.on_status)
         self._thread.start()
+        self._update_worker.moveToThread(self._update_thread)
+        self.update_check_requested.connect(self._update_worker.check)
+        self._update_worker.finished.connect(self.on_update_check)
+        self._update_thread.start()
 
     def _connect_window(self) -> None:
         self._window.refresh_requested.connect(self.refresh)
@@ -154,6 +209,9 @@ class GuiController(QObject):
         self._window.notify_changed.connect(self.on_notify)
         self._window.autostart_changed.connect(self.on_autostart)
         self._window.language_changed.connect(self.on_language)
+        self._window.check_update_requested.connect(self.check_update)
+        self._window.install_update_requested.connect(self.install_update)
+        self._window.check_updates_changed.connect(self.on_check_updates)
 
     def _connect_tray(self) -> None:
         if self._tray is None:
@@ -163,4 +221,5 @@ class GuiController(QObject):
         self._tray.show_requested.connect(self.show_window)
         self._tray.refresh_requested.connect(self.refresh)
         self._tray.quit_requested.connect(self.quit)
+        self._tray.update_requested.connect(self.install_update)
         self._tray.show()

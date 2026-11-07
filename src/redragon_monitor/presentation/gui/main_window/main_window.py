@@ -22,11 +22,19 @@ from redragon_monitor.battery.domain.battery_status import BatteryStatus
 from redragon_monitor.presentation.gui.app_settings import AppSettings
 from redragon_monitor.presentation.gui.battery_icon_painter import BatteryIconPainter
 from redragon_monitor.presentation.text.status_text_formatter import StatusTextFormatter
+from redragon_monitor.update.domain.update_check import UpdateCheck
+from redragon_monitor.update.domain.update_status import UpdateStatus
 
 EMPTY = "—"
 ICON_SIZE = 72
 MIN_WIDTH = 380
 LANGUAGE_OPTIONS = (("auto", None), ("pt", "Português"), ("en", "English"))
+LANGUAGE_TOGGLE = {"pt": ("en", "🌐 English"), "en": ("pt", "🌐 Português")}
+UPDATE_KEYS = {
+    UpdateStatus.AVAILABLE: "update.available",
+    UpdateStatus.UP_TO_DATE: "update.up_to_date",
+    UpdateStatus.FAILED: "update.failed",
+}
 
 
 class MainWindow(QWidget):
@@ -36,6 +44,9 @@ class MainWindow(QWidget):
     notify_changed = Signal(bool)
     autostart_changed = Signal(bool)
     language_changed = Signal(str)
+    check_update_requested = Signal()
+    install_update_requested = Signal()
+    check_updates_changed = Signal(bool)
 
     def __init__(
         self,
@@ -44,6 +55,7 @@ class MainWindow(QWidget):
         text: StatusTextFormatter,
         autostart_enabled: bool,
         hide_on_close: bool,
+        installed_version: str = "",
     ):
         super().__init__()
         self._painter = painter
@@ -53,10 +65,14 @@ class MainWindow(QWidget):
         self._busy = False
         self._status: Optional[BatteryStatus] = None
         self._last_good: Optional[BatteryStatus] = None
-        self.setWindowTitle("Redragon Battery Monitor")
+        self._installed_version = installed_version
+        self._update: Optional[UpdateCheck] = None
+        self._update_checking = False
+        self.setWindowTitle(f"Redragon Battery Monitor {installed_version}".strip())
         self.setMinimumWidth(MIN_WIDTH)
         self._build_status_widgets()
         self._build_settings_widgets(settings, autostart_enabled)
+        self._build_update_widgets(settings)
         self._build_layout()
         self.retranslate()
         self._set_icon(None, False)
@@ -76,7 +92,14 @@ class MainWindow(QWidget):
         self.autostart_check.setText(t("window.autostart"))
         self.note_label.setText(t("window.note"))
         self.language_combo.setItemText(0, t("window.language.auto"))
+        self.language_button.setText(LANGUAGE_TOGGLE.get(self._text.language, LANGUAGE_TOGGLE["pt"])[1])
+        self.update_box.setTitle(t("update.section"))
+        self.version_label.setText(t("update.installed", version=self._installed_version))
+        self.check_update_button.setText(t("update.check"))
+        self.install_update_button.setText(t("update.install"))
+        self.check_updates_check.setText(t("update.auto"))
         self._render()
+        self._render_update()
 
     def set_busy(self, busy: bool) -> None:
         self._busy = busy
@@ -87,6 +110,15 @@ class MainWindow(QWidget):
         self._status = status
         self._last_good = last_good
         self._render()
+
+    def show_update_checking(self) -> None:
+        self._update_checking = True
+        self._render_update()
+
+    def show_update(self, check: UpdateCheck) -> None:
+        self._update_checking = False
+        self._update = check
+        self._render_update()
 
     def set_autostart_checked(self, checked: bool) -> None:
         self.autostart_check.blockSignals(True)
@@ -112,6 +144,22 @@ class MainWindow(QWidget):
             self._show_reading(status)
             return
         self._show_unavailable(status)
+
+    def _render_update(self) -> None:
+        self.check_update_button.setEnabled(not self._update_checking)
+        self.install_update_button.setVisible(self._update is not None and self._update.available)
+        if self._update_checking:
+            self.update_status_label.setText(self._text.t("update.checking"))
+            return
+        if self._update is None:
+            self.update_status_label.setText("")
+            return
+        latest = str(self._update.latest) if self._update.latest else ""
+        self.update_status_label.setText(self._text.t(UPDATE_KEYS[self._update.status], version=latest))
+
+    def _toggle_language(self) -> None:
+        target = LANGUAGE_TOGGLE.get(self._text.language, LANGUAGE_TOGGLE["pt"])[0]
+        self.language_combo.setCurrentIndex(self.language_combo.findData(target))
 
     def _show_reading(self, status: BatteryStatus) -> None:
         reading = status.reading
@@ -191,7 +239,43 @@ class MainWindow(QWidget):
         self.autostart_check.setChecked(autostart_enabled)
         self.autostart_check.toggled.connect(self.autostart_changed)
 
+    def _build_update_widgets(self, settings: AppSettings) -> None:
+        self.header_version_label = QLabel(f"v{self._installed_version}" if self._installed_version else "")
+        self.header_version_label.setStyleSheet("color: palette(placeholder-text); font-size: 10pt;")
+        self.language_button = QPushButton()
+        self.language_button.setFlat(True)
+        self.language_button.clicked.connect(self._toggle_language)
+        self.version_label = QLabel()
+        self.update_status_label = QLabel()
+        self.update_status_label.setWordWrap(True)
+        self.check_update_button = QPushButton()
+        self.check_update_button.clicked.connect(self.check_update_requested)
+        self.install_update_button = QPushButton()
+        self.install_update_button.setVisible(False)
+        self.install_update_button.clicked.connect(self.install_update_requested)
+        self.check_updates_check = QCheckBox()
+        self.check_updates_check.setChecked(settings.check_updates)
+        self.check_updates_check.toggled.connect(self.check_updates_changed)
+
+    def _build_update_box(self) -> QGroupBox:
+        buttons = QHBoxLayout()
+        buttons.addWidget(self.check_update_button)
+        buttons.addWidget(self.install_update_button)
+        layout = QVBoxLayout()
+        layout.addWidget(self.version_label)
+        layout.addWidget(self.update_status_label)
+        layout.addLayout(buttons)
+        layout.addWidget(self.check_updates_check)
+        self.update_box = QGroupBox()
+        self.update_box.setLayout(layout)
+        return self.update_box
+
     def _build_layout(self) -> None:
+        title_row = QHBoxLayout()
+        title_row.addWidget(self.title_label)
+        title_row.addWidget(self.header_version_label)
+        title_row.addStretch(1)
+        title_row.addWidget(self.language_button)
         head = QHBoxLayout()
         head.addWidget(self.icon_label)
         column = QVBoxLayout()
@@ -215,10 +299,11 @@ class MainWindow(QWidget):
         self.note_label.setWordWrap(True)
         self.note_label.setStyleSheet("color: palette(placeholder-text); font-size: 9pt;")
         root = QVBoxLayout(self)
-        root.addWidget(self.title_label)
+        root.addLayout(title_row)
         root.addLayout(head)
         root.addWidget(self.bar)
         root.addLayout(info)
         root.addWidget(self.refresh_button)
         root.addWidget(self.settings_box)
+        root.addWidget(self._build_update_box())
         root.addWidget(self.note_label)

@@ -58,6 +58,23 @@ PT = {
     "autostart.error": "Não foi possível alterar: {error}",
     "notify.title": "Bateria do mouse baixa",
     "notify.body": "Redragon M719RGB-PRO com {percent}%. Conecte o cabo USB-C.",
+    "update.section": "Atualizações",
+    "update.installed": "Versão instalada: {version}",
+    "update.checking": "Verificando atualizações…",
+    "update.up_to_date": "Você está usando a versão mais recente.",
+    "update.available": "Nova versão disponível: {version}",
+    "update.failed": "Não foi possível verificar (sem conexão?).",
+    "update.check": "Verificar agora",
+    "update.install": "Atualizar",
+    "update.auto": "Verificar atualizações ao abrir",
+    "update.tray": "Atualizar para {version}",
+    "update.confirm.title": "Atualizar o Redragon Battery Monitor",
+    "update.confirm.body": (
+        "A versão {version} será instalada em um terminal. O programa será fechado "
+        "e aberto novamente ao final. Continuar?"
+    ),
+    "update.manual.title": "Atualização manual",
+    "update.manual.body": "Não foi possível abrir um terminal. Rode este comando:\n\n{command}",
 }
 
 EN = {
@@ -118,6 +135,23 @@ EN = {
     "autostart.error": "Could not change it: {error}",
     "notify.title": "Mouse battery low",
     "notify.body": "Redragon M719RGB-PRO at {percent}%. Connect the USB-C cable.",
+    "update.section": "Updates",
+    "update.installed": "Installed version: {version}",
+    "update.checking": "Checking for updates…",
+    "update.up_to_date": "You are using the latest version.",
+    "update.available": "New version available: {version}",
+    "update.failed": "Could not check (no connection?).",
+    "update.check": "Check now",
+    "update.install": "Update",
+    "update.auto": "Check for updates on startup",
+    "update.tray": "Update to {version}",
+    "update.confirm.title": "Update Redragon Battery Monitor",
+    "update.confirm.body": (
+        "Version {version} will be installed in a terminal. The program will close "
+        "and open again when it finishes. Continue?"
+    ),
+    "update.manual.title": "Manual update",
+    "update.manual.body": "Could not open a terminal. Run this command:\n\n{command}",
 }
 
 ENTRIES = {Language.PT: PT, Language.EN: EN}

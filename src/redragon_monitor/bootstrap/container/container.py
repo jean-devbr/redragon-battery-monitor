@@ -30,6 +30,13 @@ from redragon_monitor.presentation.i18n.translator import Translator
 from redragon_monitor.presentation.text.status_messages import StatusMessages
 from redragon_monitor.presentation.text.status_text_formatter import StatusTextFormatter
 from redragon_monitor.shared.infrastructure.system_clock import SystemClock
+from redragon_monitor import __version__
+from redragon_monitor.update.application.check_for_update import CheckForUpdateUseCase
+from redragon_monitor.update.domain.version import Version
+from redragon_monitor.update.infrastructure.github_stable_ref_source import GitHubStableRefSource
+from redragon_monitor.update.infrastructure.terminal_update_launcher import TerminalUpdateLauncher
+
+INSTALLER_URL = "https://raw.githubusercontent.com/jean-devbr/redragon-battery-monitor/main/get.sh"
 
 
 class Container:
@@ -69,6 +76,12 @@ class Container:
             translator=self._translator,
         )
 
+    def check_for_update(self) -> CheckForUpdateUseCase:
+        return CheckForUpdateUseCase(GitHubStableRefSource(INSTALLER_URL), Version.parse(__version__))
+
+    def update_launcher(self) -> TerminalUpdateLauncher:
+        return TerminalUpdateLauncher(INSTALLER_URL)
+
     def gui_argument_parser(self):
         from redragon_monitor.presentation.gui.gui_argument_parser import GuiArgumentParser
 
@@ -77,7 +90,16 @@ class Container:
     def gui_app(self):
         from redragon_monitor.presentation.gui.gui_app import GuiApp
 
-        return GuiApp(self.battery_monitor, self.autostart(), self._clock, self._text, self._translator, self._detector)
+        return GuiApp(
+            self.battery_monitor,
+            self.autostart(),
+            self._clock,
+            self._text,
+            self._translator,
+            self._detector,
+            self.check_for_update(),
+            self.update_launcher(),
+        )
 
     def _build_read_battery(self) -> ReadBatteryUseCase:
         spec = RedragonM719.spec()

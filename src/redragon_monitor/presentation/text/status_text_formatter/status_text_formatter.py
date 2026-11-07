@@ -14,6 +14,10 @@ class StatusTextFormatter:
         self._messages = messages
         self._translator = translator
 
+    @property
+    def language(self) -> str:
+        return self._translator.language.value
+
     def t(self, key: str, **values) -> str:
         return self._translator.t(key, **values)
 

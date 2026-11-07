@@ -18,7 +18,10 @@ from redragon_monitor.presentation.gui.single_instance import SingleInstance
 from redragon_monitor.presentation.gui.tray_icon import TrayIcon
 from redragon_monitor.presentation.i18n.language_detector import LanguageDetector
 from redragon_monitor.presentation.i18n.translator import Translator
+from redragon_monitor.presentation.gui.update_worker import UpdateWorker
 from redragon_monitor.presentation.text.status_text_formatter import StatusTextFormatter
+from redragon_monitor.update.application.check_for_update import CheckForUpdateUseCase
+from redragon_monitor.update.application.ports.update_launcher import UpdateLauncher
 
 log = logging.getLogger(__name__)
 
@@ -35,6 +38,8 @@ class GuiApp:
         text: StatusTextFormatter,
         translator: Translator,
         detector: LanguageDetector,
+        check_for_update: CheckForUpdateUseCase,
+        update_launcher: UpdateLauncher,
     ):
         self._monitor_factory = monitor_factory
         self._autostart = autostart
@@ -42,6 +47,8 @@ class GuiApp:
         self._text = text
         self._translator = translator
         self._detector = detector
+        self._check_for_update = check_for_update
+        self._update_launcher = update_launcher
 
     def run(self, minimized: bool) -> int:
         app = self._create_application()
@@ -75,9 +82,25 @@ class GuiApp:
         self._translator.set_language(self._detector.resolve(settings.language))
         painter = BatteryIconPainter()
         tray = TrayIcon(painter, self._text) if TrayIcon.available() else None
-        window = MainWindow(settings, painter, self._text, self._autostart.is_enabled(), hide_on_close=tray is not None)
+        window = MainWindow(
+            settings,
+            painter,
+            self._text,
+            self._autostart.is_enabled(),
+            hide_on_close=tray is not None,
+            installed_version=str(self._check_for_update.current),
+        )
         window.setWindowIcon(painter.app_icon())
         worker = BatteryWorker(self._monitor_factory(settings.threshold), self._clock)
         return GuiController(
-            app, settings, worker, window, tray, self._autostart, self._translator, self._detector
+            app,
+            settings,
+            worker,
+            window,
+            tray,
+            self._autostart,
+            self._translator,
+            self._detector,
+            UpdateWorker(self._check_for_update),
+            self._update_launcher,
         )
