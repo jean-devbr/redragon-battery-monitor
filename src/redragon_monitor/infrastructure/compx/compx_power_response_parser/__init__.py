@@ -1,0 +1,1 @@
+from .compx_power_response_parser import CompxPowerResponseParser

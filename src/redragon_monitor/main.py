@@ -1,30 +1,24 @@
-from __future__ import annotations
-
-import argparse
 import logging
 import sys
 from typing import Optional
 
-
-def _parse_args(argv):
-    p = argparse.ArgumentParser(prog="redragon-battery-gui")
-    p.add_argument("--minimized", action="store_true", help="iniciar só na bandeja")
-    p.add_argument("-v", "--verbose", action="store_true")
-    return p.parse_known_args(argv)[0]
+LOG_FORMAT = "%(levelname)s %(name)s: %(message)s"
 
 
 def main(argv: Optional[list[str]] = None) -> int:
-    args = _parse_args(sys.argv[1:] if argv is None else argv)
-    logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO,
-                        format="%(levelname)s %(name)s: %(message)s")
     try:
-        from PySide6.QtWidgets import QApplication
+        from redragon_monitor.presentation.gui.gui_argument_parser import GuiArgumentParser
+        from redragon_monitor.presentation.gui.gui_app import GuiApp
     except ImportError:
         print("PySide6 não está instalado. Rode: .venv/bin/pip install -e '.[gui]'", file=sys.stderr)
         return 1
-    from redragon_monitor.ui.app import run
+    from redragon_monitor.bootstrap.container import Container
 
-    return run(minimized=args.minimized)
+    args = GuiArgumentParser().parse(sys.argv[1:] if argv is None else argv)
+    logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO, format=LOG_FORMAT)
+    if args.export_icon:
+        return GuiApp.export_icon(args.export_icon)
+    return Container().gui_app().run(minimized=args.minimized)
 
 
 if __name__ == "__main__":

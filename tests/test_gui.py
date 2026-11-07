@@ -1,5 +1,4 @@
 import os
-from datetime import datetime
 
 import pytest
 
@@ -9,15 +8,17 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import QSettings
 from PySide6.QtWidgets import QApplication
 
-from redragon_monitor.device.battery_protocol import BatteryReading
-from redragon_monitor.device.detector import ConnectionType, DeviceInterface
-from redragon_monitor.services.battery_service import BatteryStatus, Status
-from redragon_monitor.ui.settings import AppSettings
-from redragon_monitor.ui.tray import tooltip_text
-from redragon_monitor.ui.window import MainWindow
+from redragon_monitor.domain.battery_reading import BatteryReading
+from redragon_monitor.domain.battery_status import BatteryStatus
+from redragon_monitor.domain.read_status import ReadStatus
+from redragon_monitor.presentation.gui.app_settings import AppSettings
+from redragon_monitor.presentation.gui.battery_icon_painter import BatteryIconPainter
+from redragon_monitor.presentation.gui.main_window import MainWindow
+from redragon_monitor.presentation.text.status_messages import StatusMessages
+from redragon_monitor.presentation.text.status_text_formatter import StatusTextFormatter
+from fakes import FIXED_TIME, RECEIVER
 
-T = datetime(2026, 11, 6, 23, 0, 0)
-RECV = DeviceInterface(0xF5D5, ConnectionType.RECEIVER, "/dev/hidraw1", "")
+TEXT = StatusTextFormatter(StatusMessages())
 
 
 @pytest.fixture(scope="module")
@@ -30,12 +31,17 @@ def settings(tmp_path):
     return AppSettings(QSettings(str(tmp_path / "s.conf"), QSettings.IniFormat))
 
 
-def ok(pct, charging=False):
-    return BatteryStatus(Status.OK, T, BatteryReading(pct, charging, int(charging), 4137, b""), RECV)
+def ok(percent, charging=False):
+    reading = BatteryReading(percent, charging, int(charging), 4137, b"")
+    return BatteryStatus(ReadStatus.OK, FIXED_TIME, reading=reading, interface=RECEIVER)
+
+
+def window(settings):
+    return MainWindow(settings, BatteryIconPainter(), TEXT, False, hide_on_close=False)
 
 
 def test_window_shows_reading(app, settings):
-    w = MainWindow(settings, False, hide_on_close=False)
+    w = window(settings)
     w.show_status(ok(80), None)
     assert w.percent_label.text() == "80%"
     assert w.bar.value() == 80
@@ -43,21 +49,27 @@ def test_window_shows_reading(app, settings):
 
 
 def test_window_never_shows_old_number_as_current(app, settings):
-    w = MainWindow(settings, False, hide_on_close=False)
-    good = ok(80)
-    w.show_status(BatteryStatus(Status.UNAVAILABLE, T, interface=RECV), good)
+    w = window(settings)
+    w.show_status(BatteryStatus(ReadStatus.UNAVAILABLE, FIXED_TIME, interface=RECEIVER), ok(80))
     assert w.percent_label.text() == "—"
     assert w.bar.value() == 0
     assert "80%" in w.last_good_value.text()
 
 
-def test_tooltip(app):
-    assert tooltip_text(ok(55, True), None) == "Mouse Redragon: 55% (carregando)"
-    t = tooltip_text(BatteryStatus(Status.UNAVAILABLE, T), ok(55))
-    assert "indisponível" in t and "55%" in t
+def test_tooltip():
+    assert TEXT.tooltip(ok(55, True), None) == "Mouse Redragon: 55% (carregando)"
+    tooltip = TEXT.tooltip(BatteryStatus(ReadStatus.UNAVAILABLE, FIXED_TIME), ok(55))
+    assert "indisponível" in tooltip and "55%" in tooltip
 
 
 def test_settings_clamped(settings):
     settings.interval_s = 1
     settings.threshold = 99
     assert settings.interval_s == 10 and settings.threshold == 50
+
+
+def test_icon_painter_sizes(app):
+    painter = BatteryIconPainter()
+    assert painter.pixmap(50, size=22).width() == 22
+    assert not painter.icon(None).isNull()
+    assert painter.level_color(10).name() == "#d0342c"

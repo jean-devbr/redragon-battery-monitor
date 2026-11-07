@@ -81,7 +81,7 @@ install -m 755 "$SRC_DIR/uninstall.sh" "$PREFIX/uninstall.sh"
 ln -sf "$PREFIX/uninstall.sh" "$BIN_DIR/redragon-battery-uninstall"
 
 if [[ $WITH_GUI -eq 1 ]]; then
-  QT_QPA_PLATFORM=offscreen "$VENV/bin/python" -m redragon_monitor.ui.icons "$ICON_FILE" 2>/dev/null \
+  QT_QPA_PLATFORM=offscreen "$VENV/bin/redragon-battery-gui" --export-icon "$ICON_FILE" 2>/dev/null \
     || warn "não foi possível gerar o ícone; o menu usará um ícone genérico"
   icon_name="$APP_ID"
   [[ -f "$ICON_FILE" ]] || icon_name="input-mouse"
@@ -101,7 +101,7 @@ EOF
   ok "Atalho no menu de aplicativos"
 
   if [[ -f "$CONFIG_HOME/autostart/$APP_ID.desktop" ]]; then
-    "$VENV/bin/python" -c 'from redragon_monitor.services import autostart; autostart.enable()'
+    "$VENV/bin/python" -c 'from redragon_monitor.bootstrap.container import Container; Container().autostart().enable()'
     ok "Autostart atualizado para esta instalação"
   fi
 fi

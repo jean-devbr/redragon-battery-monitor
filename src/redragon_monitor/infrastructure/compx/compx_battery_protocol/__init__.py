@@ -1,0 +1,1 @@
+from .compx_battery_protocol import CompxBatteryProtocol

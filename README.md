@@ -3,7 +3,7 @@
 Mostra a porcentagem real da bateria do mouse **Redragon M719RGB-PRO** no Ubuntu,
 com ícone na barra superior e aviso de bateria baixa.
 
-**Versão atual: 0.1.1**
+**Versão atual: 0.2.0**
 
 ## Requisitos
 
