@@ -1,0 +1,39 @@
+"""Dados REAIS capturados do M719RGB-PRO em 2026-11-06 (ver docs/PROTOCOL.md)."""
+import pytest
+
+RECEIVER_IF1_DESC = bytes.fromhex(
+    "05010902a10185010901a1000509190129051500250195057501810295017503810105010930093116"
+    "018026ff7f75109502810609381581257f750895018106050c0a380295018106c0c00603ff0900a101"
+    "85020900150026ff00750895078102c0050c0901a101850526140519002a1405751095018100c00501"
+    "0980a1018503198129832501950375018102950175058101c00602ff0902a101850826ff0075089510"
+    "0902810009029100c00604ff0902a101850609029507b102c0"
+)
+WIRED_IF1_DESC = bytes.fromhex(
+    "0605ff0900a10185100900150026ff00750895078102c00603ff0900a10185020900150026ff007508"
+    "95078102c0050c0901a10185051500263c0219002a3c02751095018100c005010980a1018503198129"
+    "8315002501950375018102950175058101c00602ff0902a10185081500" "26ff007508951009028100"
+    "09029100c00604ff0902a101850609021500" "26ff00750895" "07b102c0"
+)
+RECEIVER_IF0_DESC = bytes.fromhex(
+    "05010906a101050719e029e715002501750195088102750895018101050719002aff0026ff00750895068100c0"
+)
+
+RESP_WIRELESS = bytes.fromhex("08 04 00 00 00 02 64 00 10 29 00 00 00 00 00 00 aa")
+RESP_CHARGING = bytes.fromhex("08 04 00 00 00 02 5f 01 10 5b 00 00 00 00 00 00 7c")
+
+
+@pytest.fixture
+def fake_sysfs(tmp_path):
+    """Cria /sys/bus/hid/devices falso. Uso: fake_sysfs({nome: (descritor, hidraw)})."""
+
+    def make(devices: dict):
+        root = tmp_path / "sys"
+        base = root / "bus/hid/devices"
+        base.mkdir(parents=True)
+        for name, (desc, hidraw) in devices.items():
+            d = base / name
+            (d / "hidraw" / hidraw).mkdir(parents=True)
+            (d / "report_descriptor").write_bytes(desc)
+        return str(root)
+
+    return make
