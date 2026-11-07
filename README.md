@@ -4,7 +4,7 @@
 
 **Nível real da bateria do mouse Redragon M719RGB-PRO no Ubuntu**
 
-[![Versão](https://img.shields.io/badge/vers%C3%A3o-0.5.0-2e9d4f?style=for-the-badge)](https://github.com/jean-devbr/redragon-battery-monitor/tree/v0.5.0)
+[![Versão](https://img.shields.io/badge/vers%C3%A3o-0.5.1-2e9d4f?style=for-the-badge)](https://github.com/jean-devbr/redragon-battery-monitor/tree/v0.5.1)
 
 ![Ubuntu](https://img.shields.io/badge/Ubuntu-24.04-E95420?style=flat-square&logo=ubuntu&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)
@@ -65,7 +65,7 @@ redragon-battery --lang en
 
 ## Idioma
 
-O programa usa o idioma do Ubuntu automaticamente: português quando o sistema está em português e inglês nos demais casos. Para trocar, use o botão **🌐 English / 🌐 Português** no topo da janela, o campo **Idioma** nas configurações ou a opção `--lang pt|en` no terminal.
+O programa usa o idioma do Ubuntu automaticamente: português quando o sistema está em português e inglês nos demais casos. Para trocar, use o botão **🌐 English / 🌐 Português** no topo da janela ou a opção `--lang pt|en` no terminal.
 
 ## Atualização
 

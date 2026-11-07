@@ -48,8 +48,6 @@ PT = {
     "window.threshold": "Limite de bateria baixa:",
     "window.notify": "Notificar bateria baixa",
     "window.autostart": "Iniciar com o sistema",
-    "window.language": "Idioma:",
-    "window.language.auto": "Automático",
     "window.note": (
         "Valores informados pelo firmware do mouse. Desligado e em repouso "
         "não podem ser diferenciados: ambos aparecem como indisponível."
@@ -125,8 +123,6 @@ EN = {
     "window.threshold": "Low battery threshold:",
     "window.notify": "Notify low battery",
     "window.autostart": "Start with the system",
-    "window.language": "Language:",
-    "window.language.auto": "Automatic",
     "window.note": (
         "Values reported by the mouse firmware. Off and asleep cannot be "
         "told apart: both are shown as unavailable."

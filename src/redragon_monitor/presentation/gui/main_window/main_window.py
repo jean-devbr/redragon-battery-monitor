@@ -6,7 +6,6 @@ from PySide6.QtCore import Signal
 from PySide6.QtGui import QCloseEvent, QFont
 from PySide6.QtWidgets import (
     QCheckBox,
-    QComboBox,
     QFormLayout,
     QGroupBox,
     QHBoxLayout,
@@ -28,7 +27,6 @@ from redragon_monitor.update.domain.update_status import UpdateStatus
 EMPTY = "—"
 ICON_SIZE = 72
 MIN_WIDTH = 380
-LANGUAGE_OPTIONS = (("auto", None), ("pt", "Português"), ("en", "English"))
 LANGUAGE_TOGGLE = {"pt": ("en", "🌐 English"), "en": ("pt", "🌐 Português")}
 UPDATE_KEYS = {
     UpdateStatus.AVAILABLE: "update.available",
@@ -87,11 +85,9 @@ class MainWindow(QWidget):
         self.settings_box.setTitle(t("window.settings"))
         self.interval_caption.setText(t("window.interval"))
         self.threshold_caption.setText(t("window.threshold"))
-        self.language_caption.setText(t("window.language"))
         self.notify_check.setText(t("window.notify"))
         self.autostart_check.setText(t("window.autostart"))
         self.note_label.setText(t("window.note"))
-        self.language_combo.setItemText(0, t("window.language.auto"))
         self.language_button.setText(LANGUAGE_TOGGLE.get(self._text.language, LANGUAGE_TOGGLE["pt"])[1])
         self.update_box.setTitle(t("update.section"))
         self.version_label.setText(t("update.installed", version=self._installed_version))
@@ -158,8 +154,7 @@ class MainWindow(QWidget):
         self.update_status_label.setText(self._text.t(UPDATE_KEYS[self._update.status], version=latest))
 
     def _toggle_language(self) -> None:
-        target = LANGUAGE_TOGGLE.get(self._text.language, LANGUAGE_TOGGLE["pt"])[0]
-        self.language_combo.setCurrentIndex(self.language_combo.findData(target))
+        self.language_changed.emit(LANGUAGE_TOGGLE.get(self._text.language, LANGUAGE_TOGGLE["pt"])[0])
 
     def _show_reading(self, status: BatteryStatus) -> None:
         reading = status.reading
@@ -181,9 +176,6 @@ class MainWindow(QWidget):
     def _on_threshold(self, value: int) -> None:
         self._threshold = value
         self.threshold_changed.emit(value)
-
-    def _on_language(self, index: int) -> None:
-        self.language_changed.emit(self.language_combo.itemData(index))
 
     def _set_icon(self, percent: Optional[int], charging: bool) -> None:
         self.icon_label.setPixmap(self._painter.pixmap(percent, charging, self._threshold, ICON_SIZE))
@@ -226,12 +218,6 @@ class MainWindow(QWidget):
         self.threshold_spin.setSuffix(" %")
         self.threshold_spin.setValue(settings.threshold)
         self.threshold_spin.valueChanged.connect(self._on_threshold)
-        self.language_caption = QLabel()
-        self.language_combo = QComboBox()
-        for code, name in LANGUAGE_OPTIONS:
-            self.language_combo.addItem(name or code, code)
-        self.language_combo.setCurrentIndex(self.language_combo.findData(settings.language))
-        self.language_combo.currentIndexChanged.connect(self._on_language)
         self.notify_check = QCheckBox()
         self.notify_check.setChecked(settings.notify)
         self.notify_check.toggled.connect(self.notify_changed)
@@ -290,7 +276,6 @@ class MainWindow(QWidget):
         config = QFormLayout()
         config.addRow(self.interval_caption, self.interval_spin)
         config.addRow(self.threshold_caption, self.threshold_spin)
-        config.addRow(self.language_caption, self.language_combo)
         config.addRow(self.notify_check)
         config.addRow(self.autostart_check)
         self.settings_box = QGroupBox()
