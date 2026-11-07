@@ -9,8 +9,6 @@ RECV = DeviceInterface(0xF5D5, ConnectionType.RECEIVER, "/dev/hidraw1", "")
 
 
 class FakeTransport:
-    """Simula o hidraw. `behaviour[path]` = bytes (resposta), None (silêncio) ou exceção."""
-
     sent: list = []
 
     def __init__(self, behaviour):

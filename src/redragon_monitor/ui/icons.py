@@ -1,4 +1,3 @@
-"""Ícone de bateria desenhado em tempo real (não depende do tema de ícones)."""
 from __future__ import annotations
 
 import sys
@@ -32,21 +31,19 @@ def battery_pixmap(
     size: int = 64,
     show_text: bool = True,
 ) -> QPixmap:
-    """percent=None => estado desconhecido (cinza, '?'). Nunca desenha um nível inventado."""
     pm = QPixmap(size, size)
     pm.fill(Qt.transparent)
     p = QPainter(pm)
     p.setRenderHint(QPainter.Antialiasing)
 
     s = size / 64.0
-    compact = size <= 24  # bandeja: corpo mais alto para o número caber legível
+    compact = size <= 24
     if compact:
         body = QRectF(1 * s, 6 * s, 56 * s, 52 * s)
         nub = QRectF(57 * s, 22 * s, 6 * s, 20 * s)
     else:
         body = QRectF(2 * s, 14 * s, 54 * s, 36 * s)
         nub = QRectF(56 * s, 25 * s, 6 * s, 14 * s)
-    # contorno amarelo = carregando (visível mesmo no tamanho da bandeja)
     outline = GREY if percent is None else (CHARGING if charging else OUTLINE)
     pen = QPen(outline, 4 * s)
     p.setPen(pen)
@@ -68,7 +65,6 @@ def battery_pixmap(
         p.end()
         return pm
 
-    # texto: número (ou '?') com contorno escuro para ser legível sobre qualquer cor
     label = "?" if percent is None else str(percent)
     font = QFont()
     font.setBold(True)
@@ -112,7 +108,6 @@ def battery_icon(percent: Optional[int], charging: bool = False, threshold: int 
 
 
 def app_icon() -> QIcon:
-    """Ícone do aplicativo (bateria cheia, sem número — não representa uma leitura)."""
     icon = QIcon()
     for size in (32, 48, 64, 128, 256):
         icon.addPixmap(battery_pixmap(100, size=size, show_text=False))

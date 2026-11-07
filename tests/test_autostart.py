@@ -12,7 +12,7 @@ def test_enable_disable_roundtrip(tmp_path):
     assert autostart.is_enabled(cfg)
     autostart.disable(cfg)
     assert not autostart.is_enabled(cfg)
-    autostart.disable(cfg)  # idempotente
+    autostart.disable(cfg)
 
 
 def test_default_exec_uses_current_python():

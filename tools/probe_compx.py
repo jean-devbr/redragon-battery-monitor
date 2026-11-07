@@ -1,18 +1,4 @@
 #!/usr/bin/env python3
-"""
-probe_compx.py — Etapa 2: teste controlado do protocolo Compx (VID 0x3554).
-
-Modos:
-  --descriptor   Somente leitura do sysfs (não precisa de root, não abre o dispositivo).
-  --listen N     Leitura passiva do hidraw por N segundos (não escreve nada).
-  --query        Envia UM ÚNICO pacote, fixo e não configurável:
-                   08 04 00 00 00 00 00 00 00 00 00 00 00 00 00 00 49
-                 (Report 0x08, comando 0x04 = consulta de energia/bateria,
-                  checksum = (0x55 - soma dos 16 primeiros bytes) & 0xFF)
-                 e imprime a resposta crua + uma decodificação HIPOTÉTICA.
-
-Nenhum outro comando é suportado de propósito.
-"""
 import argparse
 import glob
 import os
@@ -40,7 +26,6 @@ def build_power_query() -> bytes:
 
 
 def find_candidates():
-    """Retorna [(hidraw_path, pid, descriptor_bytes)] para interfaces com Report 0x08/0xFF02."""
     out = []
     for dev in glob.glob("/sys/bus/hid/devices/0003:*"):
         name = os.path.basename(dev)
@@ -56,7 +41,6 @@ def find_candidates():
                 desc = f.read()
         except OSError:
             continue
-        # Usage Page 0xFF02 (06 02 FF) seguido de Report ID 8 (85 08)
         if b"\x06\x02\xff" in desc and b"\x85\x08" in desc:
             for hr in glob.glob(os.path.join(dev, "hidraw", "hidraw*")):
                 out.append(("/dev/" + os.path.basename(hr), pid, desc))
@@ -64,7 +48,6 @@ def find_candidates():
 
 
 def decode_hypothesis(r: bytes) -> str:
-    """Layout segundo hid-pulsar / MouseBattery / lamzu-battery. NÃO confirmado no M719."""
     if len(r) < PKT_LEN:
         return f"resposta curta ({len(r)} bytes) — não decodificada"
     ck_ok = checksum(r[:16]) == r[16]
@@ -89,7 +72,7 @@ def read_reports(fd, seconds, want_cmd=None):
             break
         data = os.read(fd, 64)
         if not data or data[0] != REPORT_ID:
-            continue  # ignora relatórios de movimento (ID 1), multimídia etc.
+            continue
         ts = time.strftime("%H:%M:%S")
         print(f"[{ts}] RX ({len(data)}): {data.hex(' ')}")
         got.append(data)
@@ -99,7 +82,15 @@ def read_reports(fd, seconds, want_cmd=None):
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(
+        description=(
+            "Teste controlado do protocolo Compx (VID 0x3554).\n"
+            "  --descriptor  somente leitura do sysfs\n"
+            "  --listen N    leitura passiva por N segundos\n"
+            "  --query       envia apenas 08 04 00 .. 00 49 (consulta de energia)"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--descriptor", action="store_true")
     g.add_argument("--listen", type=float, metavar="SEG")
@@ -135,7 +126,7 @@ def main():
 
         pkt = build_power_query()
         print(f"TX ({len(pkt)}): {pkt.hex(' ')}")
-        os.write(fd, pkt)  # sem endpoint OUT -> kernel envia SET_REPORT(Output) via controle
+        os.write(fd, pkt)
         got = read_reports(fd, 2.0, want_cmd=CMD_POWER)
         resp = [r for r in got if len(r) > 1 and r[1] == CMD_POWER]
         if not resp:

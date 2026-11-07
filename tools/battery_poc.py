@@ -1,20 +1,4 @@
 #!/usr/bin/env python3
-"""
-battery_poc.py — Etapa 3: prova de conceito independente.
-
-Consulta a bateria do Redragon M719RGB-PRO (VID 0x3554) usando apenas a
-biblioteca padrão do Python e /dev/hidraw. Envia somente o comando 0x04
-(consulta de energia) documentado em docs/PROTOCOL.md.
-
-Uso:
-  sudo python3 tools/battery_poc.py           # saída legível
-  sudo python3 tools/battery_poc.py --json    # saída JSON
-
-Códigos de saída:
-  0 = leitura obtida
-  1 = nenhum dispositivo / sem permissão
-  2 = dispositivo presente, mas o mouse não respondeu (desligado ou dormindo)
-"""
 import glob
 import json
 import os
@@ -23,7 +7,6 @@ import sys
 import time
 
 VID = 0x3554
-# Ordem de preferência: cabo primeiro (no modo cabo o receptor não responde).
 PIDS = {0xF55E: "usb-c", 0xF5D5: "receptor-2.4ghz"}
 REPORT_ID = 0x08
 CMD_POWER = 0x04
@@ -41,7 +24,6 @@ assert QUERY.hex(" ") == "08 04 00 00 00 00 00 00 00 00 00 00 00 00 00 00 49"
 
 
 def find_interfaces():
-    """[(pid, /dev/hidrawN)] das interfaces com Usage Page 0xFF02 + Report 0x08, na ordem de preferência."""
     found = []
     for dev in glob.glob("/sys/bus/hid/devices/0003:*"):
         parts = os.path.basename(dev).split(":")
@@ -65,12 +47,11 @@ def find_interfaces():
 
 
 def parse(resp: bytes):
-    """Valida e decodifica. Retorna dict ou None se a resposta não for confiável."""
     if len(resp) < PKT_LEN or resp[0] != REPORT_ID or resp[1] != CMD_POWER:
         return None
     if checksum(resp[:16]) != resp[16]:
         return None
-    if resp[2] != 0x00:  # status != sucesso
+    if resp[2] != 0x00:
         return None
     level, charging = resp[6], resp[7]
     if level > 100 or charging > 2:
@@ -87,7 +68,6 @@ def parse(resp: bytes):
 def query(path: str):
     fd = os.open(path, os.O_RDWR)
     try:
-        # descarta relatórios pendentes para não confundir com respostas antigas
         while select.select([fd], [], [], 0)[0]:
             os.read(fd, 64)
         os.write(fd, QUERY)
@@ -119,7 +99,7 @@ def main():
             denied.append(path)
             continue
         except OSError:
-            continue  # dispositivo removido durante a consulta
+            continue
         if result:
             result.update(status="ok", connection=PIDS[pid], device=path,
                           timestamp=time.strftime("%Y-%m-%dT%H:%M:%S"))

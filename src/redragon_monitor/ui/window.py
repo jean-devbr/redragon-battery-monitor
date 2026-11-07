@@ -1,4 +1,3 @@
-"""Janela principal."""
 from __future__ import annotations
 
 from typing import Optional
@@ -157,7 +156,6 @@ class MainWindow(QWidget):
             self.connection_value.setText(CONNECTION_LABELS.get(s.interface.connection, "—"))
             self._set_icon(r.percent, r.charging)
         else:
-            # sem leitura atual: não mostra número como se fosse atual
             self.percent_label.setText("—")
             self.state_label.setText(s.message + (f"\n{s.detail}" if s.detail else ""))
             self.bar.setEnabled(False)

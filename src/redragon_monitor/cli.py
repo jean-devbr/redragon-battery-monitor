@@ -1,10 +1,3 @@
-"""Modo terminal.
-
-Códigos de saída (consulta única):
-  0 = leitura obtida
-  1 = dispositivo não encontrado, sem permissão ou resposta inválida
-  2 = mouse não respondeu (desligado ou em repouso)
-"""
 from __future__ import annotations
 
 import argparse

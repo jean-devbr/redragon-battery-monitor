@@ -40,12 +40,12 @@ def _with(pkt: bytes, idx: int, val: int, fix_checksum=True) -> bytes:
 @pytest.mark.parametrize(
     "pkt",
     [
-        _with(RESP_WIRELESS, 16, 0xAB, fix_checksum=False),  # checksum errado
-        _with(RESP_WIRELESS, 2, 0x01),  # status de erro
-        _with(RESP_WIRELESS, 6, 101),  # nível impossível
-        _with(RESP_WIRELESS, 7, 3),  # flag desconhecida
-        _with(RESP_WIRELESS, 1, 0x03),  # outro comando
-        RESP_WIRELESS[:10],  # curta
+        _with(RESP_WIRELESS, 16, 0xAB, fix_checksum=False),
+        _with(RESP_WIRELESS, 2, 0x01),
+        _with(RESP_WIRELESS, 6, 101),
+        _with(RESP_WIRELESS, 7, 3),
+        _with(RESP_WIRELESS, 1, 0x03),
+        RESP_WIRELESS[:10],
     ],
 )
 def test_invalid_responses_are_rejected(pkt):

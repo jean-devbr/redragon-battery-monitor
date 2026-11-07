@@ -1,4 +1,3 @@
-"""Detecção do M719RGB-PRO pelo sysfs (não precisa de root e não abre o dispositivo)."""
 from __future__ import annotations
 
 import os
@@ -14,7 +13,6 @@ class ConnectionType(str, Enum):
     RECEIVER = "receptor-2.4ghz"
 
 
-# Ordem = preferência. No modo cabo o receptor não responde, então o cabo vem primeiro.
 SUPPORTED_PIDS: dict[int, ConnectionType] = {
     0xF55E: ConnectionType.USB_C,
     0xF5D5: ConnectionType.RECEIVER,
@@ -34,11 +32,10 @@ class DeviceInterface:
 
 
 def _items(desc: bytes):
-    """Itera itens curtos de um descritor HID: (tipo, tag, valor_sem_sinal)."""
     i = 0
     while i < len(desc):
         prefix = desc[i]
-        if prefix == 0xFE:  # item longo: pula
+        if prefix == 0xFE:
             if i + 2 >= len(desc):
                 return
             i += 3 + desc[i + 1]
@@ -55,12 +52,11 @@ def has_vendor_report(
     report_id: int = VENDOR_REPORT_ID,
     length: int = VENDOR_REPORT_BYTES,
 ) -> bool:
-    """True se o descritor tem Input e Output de `length` bytes no report/usage page dados."""
     g = {"page": 0, "id": 0, "size": 0, "count": 0}
     stack: list[dict] = []
     found_in = found_out = False
     for typ, tag, val in _items(desc):
-        if typ == 1:  # global
+        if typ == 1:
             if tag == 0x0:
                 g["page"] = val
             elif tag == 0x7:
@@ -73,7 +69,7 @@ def has_vendor_report(
                 stack.append(dict(g))
             elif tag == 0xB and stack:
                 g = stack.pop()
-        elif typ == 0 and tag in (0x8, 0x9):  # Input / Output
+        elif typ == 0 and tag in (0x8, 0x9):
             if (
                 g["page"] == usage_page
                 and g["id"] == report_id
@@ -92,7 +88,7 @@ def find_interfaces(sysfs_root: str = "/sys", dev_root: str = "/dev") -> list[De
     if not hid_dir.is_dir():
         return found
     for dev in sorted(hid_dir.iterdir()):
-        parts = dev.name.split(":")  # 0003:3554:F5D5.0009
+        parts = dev.name.split(":")
         if len(parts) != 3 or parts[0] != "0003":
             continue
         try:

@@ -1,7 +1,3 @@
-"""Protocolo de energia Compx (Report 0x08) validado no Redragon M719RGB-PRO.
-
-Somente o comando 0x04 (consulta de energia) é implementado. Ver docs/PROTOCOL.md.
-"""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -13,11 +9,11 @@ CMD_POWER = 0x04
 
 STATUS_OK = 0x00
 MAX_PERCENT = 100
-MAX_CHARGING_FLAG = 2  # 0/1 observados; 2 ("cheio") citado por terceiros, nunca observado
+MAX_CHARGING_FLAG = 2
 
 
 class ProtocolError(ValueError):
-    """Resposta recebida, mas inválida ou não confiável."""
+    pass
 
 
 @dataclass(frozen=True)
@@ -36,13 +32,11 @@ def checksum(first16: bytes) -> int:
 
 
 def build_power_query() -> bytes:
-    """Pacote fixo: 08 04 00 … 00 49."""
     body = bytes([REPORT_ID, CMD_POWER]) + bytes(PACKET_LEN - 3)
     return body + bytes([checksum(body)])
 
 
 def is_power_response(data: bytes) -> bool:
-    """Identifica a resposta ao comando 0x04 (sem validar o conteúdo)."""
     return len(data) >= 2 and data[0] == REPORT_ID and data[1] == CMD_POWER
 
 

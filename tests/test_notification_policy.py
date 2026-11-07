@@ -30,9 +30,9 @@ def test_rearms_after_charging():
 def test_rearms_only_above_margin():
     p = LowBatteryPolicy(threshold=20, rearm_margin=5)
     assert p.update(ok(20))
-    assert not p.update(ok(24))  # oscilação perto do limite não rearma
+    assert not p.update(ok(24))
     assert not p.update(ok(20))
-    assert not p.update(ok(25))  # rearmou
+    assert not p.update(ok(25))
     assert p.update(ok(20))
 
 

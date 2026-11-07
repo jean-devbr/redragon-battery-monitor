@@ -1,4 +1,3 @@
-"""Dados REAIS capturados do M719RGB-PRO em 2026-11-06 (ver docs/PROTOCOL.md)."""
 import pytest
 
 RECEIVER_IF1_DESC = bytes.fromhex(
@@ -24,8 +23,6 @@ RESP_CHARGING = bytes.fromhex("08 04 00 00 00 02 5f 01 10 5b 00 00 00 00 00 00 7
 
 @pytest.fixture
 def fake_sysfs(tmp_path):
-    """Cria /sys/bus/hid/devices falso. Uso: fake_sysfs({nome: (descritor, hidraw)})."""
-
     def make(devices: dict):
         root = tmp_path / "sys"
         base = root / "bus/hid/devices"

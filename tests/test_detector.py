@@ -31,8 +31,8 @@ def test_wired_is_preferred_over_receiver(fake_sysfs):
 
 def test_unknown_vendor_or_pid_ignored(fake_sysfs):
     root = fake_sysfs({
-        "0003:046D:C52B.0002": (RECEIVER_IF1_DESC, "hidraw5"),  # outro fabricante
-        "0003:3554:F507.0003": (RECEIVER_IF1_DESC, "hidraw6"),  # outro modelo 3554
+        "0003:046D:C52B.0002": (RECEIVER_IF1_DESC, "hidraw5"),
+        "0003:3554:F507.0003": (RECEIVER_IF1_DESC, "hidraw6"),
     })
     assert find_interfaces(sysfs_root=root) == []
 

@@ -1,4 +1,3 @@
-"""Ícone na bandeja (StatusNotifierItem — aparece no GNOME com a extensão AppIndicator)."""
 from __future__ import annotations
 
 from typing import Optional

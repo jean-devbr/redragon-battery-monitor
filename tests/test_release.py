@@ -1,4 +1,3 @@
-"""Garante que versão do pacote, get.sh e README andem juntos."""
 import re
 from pathlib import Path
 

@@ -1,4 +1,3 @@
-"""Iniciar com o sistema via ~/.config/autostart (padrão XDG, funciona no GNOME)."""
 from __future__ import annotations
 
 import os
@@ -15,7 +14,6 @@ def autostart_file(config_home: Optional[str] = None) -> Path:
 
 
 def default_exec() -> str:
-    """Comando que abre a GUI minimizada na bandeja usando o mesmo Python (venv) atual."""
     py = sys.executable
     if any(c in py for c in ' "\\`$'):
         py = '"' + py.replace("\\", "\\\\").replace('"', '\\"').replace("`", "\\`").replace("$", "\\$") + '"'

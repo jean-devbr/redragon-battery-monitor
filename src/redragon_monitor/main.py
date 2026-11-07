@@ -1,8 +1,3 @@
-"""Aplicação gráfica (PySide6).
-
-A consulta HID roda numa QThread para não travar a interface (pode levar até ~2 s
-por interface quando o mouse está dormindo).
-"""
 from __future__ import annotations
 
 import argparse
@@ -23,7 +18,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO,
                         format="%(levelname)s %(name)s: %(message)s")
     try:
-        from PySide6.QtWidgets import QApplication  # noqa: F401
+        from PySide6.QtWidgets import QApplication
     except ImportError:
         print("PySide6 não está instalado. Rode: .venv/bin/pip install -e '.[gui]'", file=sys.stderr)
         return 1

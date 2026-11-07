@@ -1,7 +1,3 @@
-"""Serviço de bateria: detecta, consulta e classifica o resultado.
-
-Nunca produz uma porcentagem que não tenha vindo de uma resposta válida do firmware.
-"""
 from __future__ import annotations
 
 import logging
@@ -27,11 +23,11 @@ DEFAULT_TIMEOUT = 2.0
 
 class Status(str, Enum):
     OK = "ok"
-    UNAVAILABLE = "unavailable"          # dispositivo presente, mouse não respondeu
-    NOT_FOUND = "not_found"              # nenhum receptor/cabo conectado
+    UNAVAILABLE = "unavailable"
+    NOT_FOUND = "not_found"
     PERMISSION_DENIED = "permission_denied"
     INVALID_RESPONSE = "invalid_response"
-    ERROR = "error"                      # falha inesperada (bug ou erro de sistema)
+    ERROR = "error"
 
 
 MESSAGES = {
@@ -95,7 +91,7 @@ class BatteryService:
             except PermissionError:
                 denied += 1
                 continue
-            except OSError as e:  # dispositivo removido durante a consulta etc.
+            except OSError as e:
                 log.debug("falha em %s: %s", iface.hidraw_path, e)
                 continue
             if raw is None:

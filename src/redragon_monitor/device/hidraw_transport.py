@@ -1,9 +1,3 @@
-"""Acesso de baixo nível ao /dev/hidrawN usando apenas a biblioteca padrão.
-
-Escolhido no lugar do hidapi porque: (1) foi o caminho validado na prova de conceito;
-(2) o alvo é só Linux; (3) evita uma dependência. O backend hidraw do hidapi faz as
-mesmas chamadas read/write.
-"""
 from __future__ import annotations
 
 import os
@@ -20,7 +14,6 @@ class HidrawTransport:
         self._fd: Optional[int] = None
 
     def open(self) -> "HidrawTransport":
-        # PermissionError / FileNotFoundError propagam para o serviço classificar
         self._fd = os.open(self.path, os.O_RDWR | os.O_CLOEXEC)
         return self
 
@@ -42,7 +35,6 @@ class HidrawTransport:
         return self._fd
 
     def drain(self) -> None:
-        """Descarta relatórios pendentes (evita confundir com respostas antigas)."""
         while select.select([self.fd], [], [], 0)[0]:
             if not os.read(self.fd, READ_SIZE):
                 break
@@ -53,7 +45,6 @@ class HidrawTransport:
         match: Callable[[bytes], bool],
         timeout: float,
     ) -> Optional[bytes]:
-        """Envia `packet` e devolve o primeiro relatório que satisfaz `match`, ou None."""
         self.drain()
         os.write(self.fd, packet)
         deadline = time.monotonic() + timeout

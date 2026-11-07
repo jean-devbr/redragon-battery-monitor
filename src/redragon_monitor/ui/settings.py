@@ -1,4 +1,3 @@
-"""Preferências persistidas em ~/.config/redragon-battery-monitor/settings.conf."""
 from __future__ import annotations
 
 from PySide6.QtCore import QSettings

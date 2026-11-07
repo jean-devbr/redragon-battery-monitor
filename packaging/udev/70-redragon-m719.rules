@@ -1,13 +1,2 @@
-# Redragon M719RGB-PRO (Compx, VID 3554) — acesso sem root à interface de bateria.
-#
-# Concede acesso (ACL via "uaccess") ao usuário logado na sessão local, somente
-# no hidraw da INTERFACE 1 (Usage Page 0xFF02, Report 0x08) do receptor (f5d5)
-# e do cabo USB-C (f55e). As interfaces 0 e 2 (teclado/macros) NÃO são liberadas.
-#
-# Duas regras porque idVendor (usb_device) e bInterfaceNumber (usb_interface)
-# ficam em pais diferentes no sysfs, e udev exige que os ATTRS de uma mesma
-# regra casem no mesmo pai. O arquivo precisa ter número < 73 (antes de
-# 73-seat-late.rules, que aplica o uaccess).
-
 SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3554", ATTRS{idProduct}=="f5d5|f55e", ENV{REDRAGON_M719}="1"
 SUBSYSTEM=="hidraw", ENV{REDRAGON_M719}=="1", ATTRS{bInterfaceNumber}=="01", TAG+="uaccess"

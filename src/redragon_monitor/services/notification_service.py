@@ -1,4 +1,3 @@
-"""Política de bateria baixa e envio de notificações do desktop (notify-send / libnotify)."""
 from __future__ import annotations
 
 import logging
@@ -15,13 +14,6 @@ DEFAULT_REARM_MARGIN = 5
 
 
 class LowBatteryPolicy:
-    """Dispara uma vez por ciclo de descarga.
-
-    - Dispara quando: leitura válida, fora da carga, percent <= threshold e armado.
-    - Rearma quando: começa a carregar ou percent >= threshold + margem.
-    - Leituras indisponíveis/invalidas não alteram o estado (não inventa nada).
-    """
-
     def __init__(self, threshold: int = DEFAULT_THRESHOLD, rearm_margin: int = DEFAULT_REARM_MARGIN):
         if not 1 <= threshold <= 99:
             raise ValueError("threshold deve estar entre 1 e 99")

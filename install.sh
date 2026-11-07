@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
-# Instalador do Redragon Battery Monitor.
-# Instala para o usuário atual; só usa sudo para dependências do apt e a regra udev.
-#
-# Uso: ./install.sh [--no-gui] [--no-udev]
 set -euo pipefail
 
 APP_ID="redragon-battery-monitor"
@@ -30,7 +26,7 @@ for arg in "$@"; do
   case "$arg" in
     --no-gui)  WITH_GUI=0 ;;
     --no-udev) WITH_UDEV=0 ;;
-    -h|--help) sed -n '2,6p' "$0"; exit 0 ;;
+    -h|--help) echo "Uso: ./install.sh [--no-gui] [--no-udev]"; exit 0 ;;
     *) die "opção desconhecida: $arg" ;;
   esac
 done
@@ -40,14 +36,13 @@ done
 command -v python3 >/dev/null || die "python3 não encontrado"
 python3 -c 'import sys; sys.exit(sys.version_info < (3, 10))' || die "É necessário Python 3.10 ou mais novo"
 
-# ---------------------------------------------------------------- 1. apt
 is_installed() { dpkg-query -W -f='${Status}' "$1" 2>/dev/null | grep -q "install ok installed"; }
 need=()
 if command -v dpkg-query >/dev/null; then
   is_installed python3-venv || need+=(python3-venv)
   command -v notify-send >/dev/null || need+=(libnotify-bin)
   if [[ $WITH_GUI -eq 1 ]]; then
-    is_installed libxcb-cursor0 || need+=(libxcb-cursor0)  # exigido pelo Qt 6 no X11
+    is_installed libxcb-cursor0 || need+=(libxcb-cursor0)
   fi
 else
   warn "dpkg não encontrado (não é Ubuntu/Debian?): pulando verificação de pacotes do sistema"
@@ -58,7 +53,6 @@ if ((${#need[@]})); then
 fi
 ok "Dependências do sistema"
 
-# ---------------------------------------------------------------- 2. venv + pacote
 info "Preparando ambiente Python em $VENV"
 mkdir -p "$PREFIX"
 if [[ ! -x "$VENV/bin/python" ]] || ! "$VENV/bin/python" -c 'import sys' 2>/dev/null; then
@@ -71,12 +65,11 @@ SPEC="$SRC_DIR"
 if [[ $WITH_GUI -eq 1 ]] && ! "$VENV/bin/python" -c 'import PySide6' 2>/dev/null; then
   info "Baixando PySide6 (cerca de 270 MB na primeira vez)…"
 fi
-"${PIP[@]}" uninstall -y "$APP_ID" >/dev/null 2>&1 || true   # garante cópia nova do código
+"${PIP[@]}" uninstall -y "$APP_ID" >/dev/null 2>&1 || true
 "${PIP[@]}" install "$SPEC"
 rm -rf "$SRC_DIR/build"
 ok "Pacote instalado"
 
-# ---------------------------------------------------------------- 3. comandos
 mkdir -p "$BIN_DIR"
 ln -sf "$VENV/bin/redragon-battery" "$BIN_DIR/redragon-battery"
 if [[ $WITH_GUI -eq 1 ]]; then
@@ -84,11 +77,9 @@ if [[ $WITH_GUI -eq 1 ]]; then
 fi
 ok "Comandos em $BIN_DIR"
 
-# desinstalador fica junto da instalação (a pasta do código pode ter sido temporária)
 install -m 755 "$SRC_DIR/uninstall.sh" "$PREFIX/uninstall.sh"
 ln -sf "$PREFIX/uninstall.sh" "$BIN_DIR/redragon-battery-uninstall"
 
-# ---------------------------------------------------------------- 4. menu de aplicativos
 if [[ $WITH_GUI -eq 1 ]]; then
   QT_QPA_PLATFORM=offscreen "$VENV/bin/python" -m redragon_monitor.ui.icons "$ICON_FILE" 2>/dev/null \
     || warn "não foi possível gerar o ícone; o menu usará um ícone genérico"
@@ -109,14 +100,12 @@ StartupNotify=false
 EOF
   ok "Atalho no menu de aplicativos"
 
-  # se o autostart já estava ativo (ex.: criado pela versão de desenvolvimento), aponta para esta instalação
   if [[ -f "$CONFIG_HOME/autostart/$APP_ID.desktop" ]]; then
     "$VENV/bin/python" -c 'from redragon_monitor.services import autostart; autostart.enable()'
     ok "Autostart atualizado para esta instalação"
   fi
 fi
 
-# ---------------------------------------------------------------- 5. udev
 if [[ $WITH_UDEV -eq 1 ]]; then
   if [[ -f "$UDEV_DST" ]] && cmp -s "$UDEV_SRC" "$UDEV_DST"; then
     ok "Regra udev já instalada"
@@ -132,7 +121,6 @@ else
   warn "Regra udev não instalada (--no-udev): o acesso ao mouse vai exigir sudo"
 fi
 
-# ---------------------------------------------------------------- 6. verificação
 echo
 info "Teste de leitura:"
 set +e

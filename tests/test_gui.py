@@ -1,4 +1,3 @@
-"""Testes da GUI em modo offscreen com status sintéticos (não são leituras reais)."""
 import os
 from datetime import datetime
 
@@ -7,15 +6,15 @@ import pytest
 pytest.importorskip("PySide6")
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from PySide6.QtCore import QSettings  # noqa: E402
-from PySide6.QtWidgets import QApplication  # noqa: E402
+from PySide6.QtCore import QSettings
+from PySide6.QtWidgets import QApplication
 
-from redragon_monitor.device.battery_protocol import BatteryReading  # noqa: E402
-from redragon_monitor.device.detector import ConnectionType, DeviceInterface  # noqa: E402
-from redragon_monitor.services.battery_service import BatteryStatus, Status  # noqa: E402
-from redragon_monitor.ui.settings import AppSettings  # noqa: E402
-from redragon_monitor.ui.tray import tooltip_text  # noqa: E402
-from redragon_monitor.ui.window import MainWindow  # noqa: E402
+from redragon_monitor.device.battery_protocol import BatteryReading
+from redragon_monitor.device.detector import ConnectionType, DeviceInterface
+from redragon_monitor.services.battery_service import BatteryStatus, Status
+from redragon_monitor.ui.settings import AppSettings
+from redragon_monitor.ui.tray import tooltip_text
+from redragon_monitor.ui.window import MainWindow
 
 T = datetime(2026, 11, 6, 23, 0, 0)
 RECV = DeviceInterface(0xF5D5, ConnectionType.RECEIVER, "/dev/hidraw1", "")

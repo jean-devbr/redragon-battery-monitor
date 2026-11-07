@@ -1,4 +1,3 @@
-"""Controlador da GUI: liga serviço, thread de consulta, janela, bandeja e notificações."""
 from __future__ import annotations
 
 import logging
@@ -25,8 +24,6 @@ INSTANCE_KEY = f"redragon-battery-monitor-{os.getuid()}"
 
 
 class BatteryWorker(QObject):
-    """Vive na thread de consulta. Emite (status_atual, última_leitura_válida)."""
-
     finished = Signal(object, object)
 
     def __init__(self, service: BatteryService):
@@ -37,7 +34,7 @@ class BatteryWorker(QObject):
     def poll(self) -> None:
         try:
             s = self._service.read()
-        except Exception as e:  # nunca derruba a GUI por falha de consulta
+        except Exception as e:
             log.exception("falha inesperada na consulta")
             s = BatteryStatus(Status.ERROR, datetime.now(), detail=str(e))
         self.finished.emit(s, self._service.last_good)
@@ -60,7 +57,6 @@ class Controller(QObject):
         self.window = MainWindow(self.settings, autostart.is_enabled(), hide_on_close=self.tray is not None)
         self.window.setWindowIcon(app_icon())
 
-        # thread de consulta
         self.thread = QThread(self)
         self.worker = BatteryWorker(BatteryService())
         self.worker.moveToThread(self.thread)
@@ -72,7 +68,6 @@ class Controller(QObject):
         self.timer.timeout.connect(self.refresh)
         self.timer.start(self.settings.interval_s * 1000)
 
-        # sinais da janela
         w = self.window
         w.refresh_requested.connect(self.refresh)
         w.interval_changed.connect(self.on_interval)
@@ -91,7 +86,6 @@ class Controller(QObject):
             self.show_window()
         self.refresh()
 
-    # --- consulta ---
     @Slot()
     def refresh(self) -> None:
         if self._busy:
@@ -112,7 +106,6 @@ class Controller(QObject):
         if self.policy.update(s) and self.settings.notify:
             self.notifier.low_battery(s.reading.percent)
 
-    # --- configurações ---
     @Slot(int)
     def on_interval(self, v: int) -> None:
         self.settings.interval_s = v
@@ -143,7 +136,6 @@ class Controller(QObject):
             self.window.autostart_check.setChecked(autostart.is_enabled())
             self.window.autostart_check.blockSignals(False)
 
-    # --- janela / ciclo de vida ---
     @Slot()
     def show_window(self) -> None:
         self.window.show()
@@ -179,7 +171,7 @@ def run(minimized: bool = False) -> int:
         log.info("já está em execução; janela existente foi trazida para frente")
         return 0
 
-    QLocalServer.removeServer(INSTANCE_KEY)  # limpa socket órfão de execução anterior
+    QLocalServer.removeServer(INSTANCE_KEY)
     server = QLocalServer()
     server.listen(INSTANCE_KEY)
 

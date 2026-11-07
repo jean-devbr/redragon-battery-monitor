@@ -1,9 +1,4 @@
 #!/usr/bin/env bash
-# Remove o Redragon Battery Monitor instalado por install.sh.
-#
-# Uso: ./uninstall.sh [--purge] [--keep-udev]
-#   --purge      também apaga as preferências (~/.config/redragon-battery-monitor)
-#   --keep-udev  mantém a regra udev
 set -euo pipefail
 
 APP_ID="redragon-battery-monitor"
@@ -20,7 +15,11 @@ for arg in "$@"; do
   case "$arg" in
     --purge) PURGE=1 ;;
     --keep-udev) KEEP_UDEV=1 ;;
-    -h|--help) sed -n '2,7p' "$0"; exit 0 ;;
+    -h|--help)
+      echo "Uso: redragon-battery-uninstall [--purge] [--keep-udev]"
+      echo "  --purge      também apaga as preferências"
+      echo "  --keep-udev  mantém a regra udev"
+      exit 0 ;;
     *) echo "opção desconhecida: $arg" >&2; exit 1 ;;
   esac
 done
@@ -28,10 +27,8 @@ done
 
 ok() { printf '\033[1;32m ✓\033[0m %s\n' "$*"; }
 
-# encerra a GUI instalada, se estiver aberta
 pkill -u "$USER" -f "$VENV/bin/" 2>/dev/null && ok "Programa em execução encerrado" || true
 
-# só remove links que apontam para esta instalação
 for cmd in redragon-battery redragon-battery-gui redragon-battery-uninstall; do
   link="$BIN_DIR/$cmd"
   if [[ -L "$link" && "$(readlink "$link")" == "$PREFIX/"* ]]; then
